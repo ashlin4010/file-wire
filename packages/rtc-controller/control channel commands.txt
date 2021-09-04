@@ -1,0 +1,28 @@
+// send
+LIST_DIRECTORY
+data: {path: string}
+
+DELETE_FILE
+data: {path: string}
+
+DELETE_DIRECTORY
+data: {path: string}
+
+LIST_FILE_CHANNEL
+data: {fileChannel[]}
+
+CLOSE_FILE_CHANNEL
+data: {id: string}
+
+OPEN_FILE_CHANNEL
+data: {path: string, mode: R | W}
+
+CLOSE_CONNECTION
+data: {code: number, reason: }
+
+// extra stuff
+
+CREATE_FILE
+data: {path: string}
+then OPEN_FILE_CHANNEL send data
+

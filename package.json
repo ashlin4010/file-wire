@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  },
+  "name": "file-wire",
+  "repository": "https://github.com/ashlin4010/file-wire.git",
+  "author": "ashlin4010",
+  "scripts": {
+    "build": "lerna run build"
+  }
+}

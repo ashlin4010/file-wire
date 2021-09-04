@@ -1,0 +1,13 @@
+// clean up node-modules
+npx lerna clean -y
+
+// link node-modules
+npx lerna bootstrap --hoist
+
+//add sibling package to other package
+lerna add common-file-system packages/testing
+npx lerna clean -y
+npx lerna bootstrap --hoist
+
+// build
+npx lerna run biuld
