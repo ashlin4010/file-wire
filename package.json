@@ -7,7 +7,7 @@
   "author": "ashlin4010",
   "license": "MIT",
   "scripts": {
-    "build": "lerna run build",
-    "postinstall": "lerna bootstrap"
+    "build": "npx lerna run build",
+    "postinstall": "npx lerna bootstrap"
   }
 }
