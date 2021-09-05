@@ -5,6 +5,7 @@
   "name": "file-wire",
   "repository": "https://github.com/ashlin4010/file-wire.git",
   "author": "ashlin4010",
+  "license": "MIT",
   "scripts": {
     "build": "lerna run build",
     "postinstall": "lerna bootstrap"
