@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,11 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "common-file-system": "^1.0.0",
+    "common-file-system": "^0.0.1",
     "express": "^4.17.1",
-    "rtc-connection": "^1.0.0",
-    "rtc-controller": "^1.0.0",
-    "ws-domain": "^1.0.0"
+    "rtc-connection": "^0.0.1",
+    "rtc-controller": "^0.0.1",
+    "ws-domain": "^0.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

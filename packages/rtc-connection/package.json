@@ -1,6 +1,6 @@
 {
   "name": "rtc-connection",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "dest/index.js",
   "dependencies": {
     "node-pre-gyp": "^0.17.0",
