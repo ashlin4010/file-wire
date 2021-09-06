@@ -1,24 +1,37 @@
+response codes (http)
+200 ok
+400 bad request
+401 Unauthorized
+500 Internal Server Error
+
 // send
 LIST_DIRECTORY
 data: {path: string}
+rdata: {code: 200, data: [strings]}
 
 DELETE_FILE
 data: {path: string}
+rdata: {code: 200}
 
 DELETE_DIRECTORY
 data: {path: string}
+rdata: {code: 200}
 
 LIST_FILE_CHANNEL
-data: {fileChannel[]}
+data: {}
+rdata: {code: 200, [string]}
 
 CLOSE_FILE_CHANNEL
 data: {id: string}
+rdata: {code: 200, [string]}
 
 OPEN_FILE_CHANNEL
 data: {path: string, mode: R | W}
+rdata: {code: 200, [string]}
 
 CLOSE_CONNECTION
 data: {code: number, reason: }
+rdata: {code: 200}
 
 // extra stuff
 

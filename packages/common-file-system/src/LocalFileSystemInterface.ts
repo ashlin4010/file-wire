@@ -54,7 +54,6 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
     }
 
     readdir(path: string, callback: (err: (Error | null), files?: string[]) => void): void {
-
         fs.readdir(this.safePath(path), callback);
     }
 
@@ -67,7 +66,7 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
     }
 
     rmdir(path: string, callback: (err: (Error | null)) => void): void {
-        fs.rmdir(this.safePath(path), callback);
+        fs.rmdir(this.safePath(path), {recursive: true}, callback);
     }
 
     stat(path: string, callback: (err: (Error | null), stats?: Stats) => void): void {

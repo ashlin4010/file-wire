@@ -1,3 +1,6 @@
+// connection will not reconnect if the scrip is restated this is because
+// the host does not handle each client just the first
+
 const {WsDuplex, RTCConnection } = require("rtc-connection");
 const { DomainConnection } = require("ws-domain");
 const { RTCController } = require("rtc-controller");
@@ -17,10 +20,8 @@ try{
     domainConnection = new DomainConnection(url, domain, isServer ? "token" : undefined);
 } catch (e) {
     log("Websocket connection failed to be established, the target might not be online");
-    button.disabled = false;
     return;
 }
-
 
 domainConnection.on("connect", async (wsProxy) => {
     let ws;
@@ -34,10 +35,15 @@ domainConnection.on("connect", async (wsProxy) => {
 
     rtc.on("connect", () => log("RTC open!"));
 
-    controller.on("control", (channel) => {
+    controller.on("control", async (channel) => {
         log("Control open!");
-        controller.getFiles("./request for data").then(data => {
-            log(data);
-        });
+
+        // working
+        let files = await controller.getFiles("./");
+        log(files);
+        let deleted = await controller.deleteDirectory("./test");
+        files = await controller.getFiles("./");
+        log(files);
+        log(deleted);
     });
 });

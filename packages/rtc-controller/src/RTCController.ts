@@ -4,16 +4,24 @@ import { ReqResChannel } from "./ReqResChannel";
 
 const CONTROL_CHANNEL_LABEL = "CONTROL";
 
-enum ControlCommands {
+enum ControlCommand {
     "LIST_DIRECTORY",
     "DELETE_FILE",
     "DELETE_DIRECTORY",
     "CREATE_FILE",
     "CREATE_DIRECTORY",
+    "RENAME",
     "LIST_FILE_CHANNEL",
     "CLOSE_FILE_CHANNEL",
     "OPEN_FILE_CHANNEL",
     "CLOSE_CONNECTION",
+}
+
+enum ControlStatusCodes {
+    OK = 200,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    INTERNAL_SERVER_ERROR = 500
 }
 
 export declare interface RTCController {
@@ -43,15 +51,67 @@ export class RTCController extends EventEmitter {
         if(isInitiator) this.createControlChannel();
     }
 
-    handleDataChannel(channel: RTCDataChannel) {
-
+    // handle new data channels including control channel
+    private handleDataChannel(channel: RTCDataChannel) {
         if(channel.label === CONTROL_CHANNEL_LABEL) {
             let controlChannel = this.controlChannel = new ReqResChannel(channel, true);
             controlChannel.channel.addEventListener("open", () => {
                 this.emit("control", controlChannel);
             });
+
+            controlChannel.on("message", this.handleDataChannelCommand.bind(this));
         }
     }
+
+    // handle commands
+    private handleDataChannelCommand({command, data}: {command: ControlCommand, data: any}, send: (data: any) => void) {
+        let fs = this.fs;
+
+        // list directory content
+        function listDirectory(send: Function,command: ControlCommand, data: {path: string} | undefined) {
+            if (data?.path) {
+                fs.readdir(data.path, (err: any, files: any) => send({
+                    code: err ? ControlStatusCodes.INTERNAL_SERVER_ERROR : ControlStatusCodes.OK,
+                    data: files
+                }));
+            } else send({code: ControlStatusCodes.BAD_REQUEST});
+        }
+
+        // delete directory
+        function deleteDirectory(send: Function,command: ControlCommand, data: {path: string} | undefined) {
+            if (data?.path) {
+                fs.rmdir(data.path, (err: any, files: any) => send({
+                    code: err ? ControlStatusCodes.INTERNAL_SERVER_ERROR : ControlStatusCodes.OK,
+                    message: err,
+                    data: files
+                }));
+            } else send({code: ControlStatusCodes.BAD_REQUEST});
+        }
+
+        // delete file
+        function deleteFile(send: Function,command: ControlCommand, data: {path: string} | undefined) {
+            if (data?.path) {
+                fs.rm(data.path, (err: any, files: any) => send({
+                    code: err ? ControlStatusCodes.INTERNAL_SERVER_ERROR : ControlStatusCodes.OK,
+                    data: files
+                }));
+            } else send({code: ControlStatusCodes.BAD_REQUEST});
+        }
+
+        // rename
+        function rename(send: Function,command: ControlCommand, data: {path: string} | undefined) {
+
+        }
+
+
+        switch (command) {
+            case ControlCommand.LIST_DIRECTORY: listDirectory(send, command, data); break;
+            case ControlCommand.DELETE_DIRECTORY: deleteDirectory(send, command, data); break;
+            case ControlCommand.DELETE_FILE: deleteFile(send, command, data); break;
+        }
+    }
+
+
 
     private createControlChannel(): ReqResChannel {
         let controlChannel = new ReqResChannel(this.rtc.createDataChannel(CONTROL_CHANNEL_LABEL));
@@ -61,21 +121,22 @@ export class RTCController extends EventEmitter {
         return this.controlChannel = controlChannel;
     }
 
-    sendCommand(command: ControlCommands | string, data: any) {
+    // send commands
+    sendCommand(command: ControlCommand | string, data: any) {
         if(!this.controlChannel) throw "Control channel has yet to be established";
         return this.controlChannel.send({ command, data });
     }
 
     getFiles(path: string) {
-        return this.sendCommand(ControlCommands.LIST_DIRECTORY, {path: path});
+        return this.sendCommand(ControlCommand.LIST_DIRECTORY, {path: path});
     }
 
     deleteFile(path: string) {
-        return this.sendCommand(ControlCommands.DELETE_FILE, {path: path});
+        return this.sendCommand(ControlCommand.DELETE_FILE, {path: path});
     }
 
     deleteDirectory(path: string) {
-        return this.sendCommand(ControlCommands.DELETE_DIRECTORY, {path: path});
+        return this.sendCommand(ControlCommand.DELETE_DIRECTORY, {path: path});
     }
 
 }
