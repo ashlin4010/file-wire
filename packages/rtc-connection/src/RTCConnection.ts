@@ -5,9 +5,8 @@ import * as EventEmitter from "events";
 const RTCPeerConnection: RTCPeerConnection = WebRTC.RTCPeerConnection;
 
 export declare interface RTCConnection {
-
     on(event: string, listener: Function): this;
-    on(event: 'datachannel', listener: (name: string) => void): this;
+    on(event: 'datachannel', listener: (channel: RTCDataChannel) => void): this;
     on(event: 'connect', listener: (name: string) => void): this;
     on(event: 'disconnect', listener: (name: string) => void): this;
 }
@@ -35,11 +34,9 @@ export class RTCConnection extends EventEmitter {
 
         this.duplex.on("data", this.handleDuplexData.bind(this));
 
+
         // @ts-ignore
         this.RTCPeerConnection = new RTCPeerConnection(this.configuration);
-
-        console.log(this.RTCPeerConnection);
-
         this.RTCPeerConnection.ondatachannel = this.handleDataChannel.bind(this);
         this.RTCPeerConnection.onconnectionstatechange = this.handleConnectionStateChange.bind(this);
         this.RTCPeerConnection.onsignalingstatechange = this.handleSignalingStateChange.bind(this);
@@ -48,7 +45,7 @@ export class RTCConnection extends EventEmitter {
 
     }
 
-    private handleDuplexData(data: any) {
+    private handleDuplexData(data: any): void {
         if (data.type === 'offer') {
             this.RTCPeerConnection.setRemoteDescription(data).catch(console.error);
             this.RTCPeerConnection.createAnswer().then(description => {
@@ -63,23 +60,22 @@ export class RTCConnection extends EventEmitter {
         }
     }
 
-    private handleDataChannel({channel}: { channel: RTCDataChannel }) {
+    private handleDataChannel({ channel }: { channel: RTCDataChannel }): void {
         this.emit("datachannel", channel);
     }
 
-    private handleConnectionStateChange() {
-        console.log("Connection state:", this.RTCPeerConnection.connectionState);
+    private handleConnectionStateChange(): void {
         if (this.RTCPeerConnection.connectionState === "disconnected") this.close();
         if (this.RTCPeerConnection.connectionState === "failed") this.close();
     }
 
-    private handleSignalingStateChange() {
+    private handleSignalingStateChange(): void {
         if (this.RTCPeerConnection.signalingState === "stable") {
             this.emit("connect");
         }
     }
 
-    private handleIceCandidate({candidate}: RTCPeerConnectionIceEvent) {
+    private handleIceCandidate({candidate}: RTCPeerConnectionIceEvent): void {
         if (candidate && candidate.candidate) {
             this.duplex.write({
                 type: 'candidate',
@@ -90,8 +86,7 @@ export class RTCConnection extends EventEmitter {
         }
     }
 
-    private handleNegotiationNeeded() {
-        console.log("negotiation needed");
+    private handleNegotiationNeeded(): void {
         // start negotiation
         this.RTCPeerConnection.createOffer().then(SDP_offer => {
             this.RTCPeerConnection.setLocalDescription(SDP_offer).then(() => {
@@ -100,22 +95,16 @@ export class RTCConnection extends EventEmitter {
         }).catch(console.error);
     }
 
-    addDataChannel(label: string): void {
 
-        // add channel
-        console.log("add chanel");
+    createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit | undefined): RTCDataChannel {
+        return this.RTCPeerConnection.createDataChannel(label, dataChannelDict);
+    }
 
-        let channel = this.RTCPeerConnection.createDataChannel(label);
-        channel.onerror = e => {
-            console.log(e)
-        };
+    getTransceivers(): Array<RTCRtpTransceiver> {
+        return this.RTCPeerConnection.getTransceivers();
     }
 
     close() {
-        // Object.values(this.dataChannels).forEach(channel => {
-        //     channel.close();
-        // });
-
         this.RTCPeerConnection.close();
         this.RTCPeerConnection.ondatachannel = null;
         this.RTCPeerConnection.onconnectionstatechange = null;

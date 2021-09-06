@@ -1,2 +1,1 @@
-import { RTCController } from "./RTCController";
-export default RTCController;
+export { RTCController } from "./RTCController";

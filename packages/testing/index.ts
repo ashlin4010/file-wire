@@ -1,6 +1,6 @@
 import { FileSystemInterface } from "common-file-system";
 import { RTCConnection } from "rtc-connection";
-import RTCController from "rtc-controller";
+import { RTCController } from "rtc-controller";
 
 import { DomainConnection, WebSocketDomainServer } from "ws-domain";
 
