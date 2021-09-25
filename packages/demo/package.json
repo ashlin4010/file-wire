@@ -1,13 +1,10 @@
 {
   "name": "demo",
   "version": "0.0.1",
-  "description": "",
+  "description": "Random demos and testing",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "author": "ashlin4010",
+  "license": "MIT",
   "dependencies": {
     "common-file-system": "^0.0.1",
     "express": "^4.17.1",

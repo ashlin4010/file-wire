@@ -5,11 +5,10 @@ import { ProxyClient } from "./ProxyClient";
 import { ProxyServer } from "./ProxyServer";
 import {ProxyConnection} from "./ProxyConnection";
 
-
 type ConnectionListener = (ws: ProxyConnection) => void;
 type MessageListener = (data: any) => void;
 
-interface Proxy {
+export interface Proxy {
     on(event: 'connection', listener: ConnectionListener): this;
     on(event: 'message', listener: MessageListener): this;
     onconnect?: ConnectionListener;
@@ -18,7 +17,7 @@ interface Proxy {
 }
 
 
-type ErrorListener = () => void;
+type ErrorListener = (error: any) => void;
 type ConnectListener = (proxy: Proxy) => void;
 type DisconnectListener = (code: number, reason: string) => void;
 
@@ -47,7 +46,6 @@ export class DomainConnection extends EventEmitter {
         this.domain = domain;
         this.url    = url;
 
-
         let fullURL = buildUrl(url, {
             path: domain,
             queryParams: token? {"token": token} : undefined
@@ -72,9 +70,9 @@ export class DomainConnection extends EventEmitter {
         this.emit("disconnect", code, reason);
     }
 
-    private handleError(): void {
-        if (this.onerror) this.onerror();
-        this.emit("error");
+    private handleError(err: any): void {
+        if (this.onerror) this.onerror(err);
+        this.emit("error", err);
     }
 
 }

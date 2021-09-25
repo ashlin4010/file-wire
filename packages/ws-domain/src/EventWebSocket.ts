@@ -4,7 +4,7 @@ type MessageData = string | Buffer | ArrayBuffer | Buffer[];
 
 type OpenListener =     () => void;
 type CloseListener =    (code: number, reason: string) => void;
-type ErrorListener =    () => void;
+type ErrorListener =    (error: any) => void;
 type MessageListener =  (data: MessageData) => void;
 
 export declare interface EventWebSocket {

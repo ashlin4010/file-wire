@@ -1,5 +1,6 @@
 .idea/
 node_modules/
 lerna-debug.log
+packages/testing
 packages/*/node_modules
 packages/*/dest

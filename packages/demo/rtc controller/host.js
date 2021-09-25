@@ -17,8 +17,6 @@ try{
     domainConnection = new DomainConnection(url, domain, isServer ? "token" : undefined);
 } catch (e) {
     log("Websocket connection failed to be established, the target might not be online");
-    button.disabled = false;
-    return;
 }
 
 

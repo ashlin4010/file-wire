@@ -1,7 +1,13 @@
 {
   "name": "rtc-connection",
   "version": "0.0.1",
+  "description": "Library for managing WebRTC connections",
+  "author": "ashlin4010",
+  "license": "MIT",
   "main": "dest/index.js",
+  "scripts": {
+    "build": "npx tsc"
+  },
   "dependencies": {
     "node-pre-gyp": "^0.17.0",
     "wrtc": "^0.4.7"
@@ -9,11 +15,5 @@
   "devDependencies": {
     "@types/node": "^16.7.5",
     "typescript": "^4.4.2"
-  },
-  "scripts": {
-    "build": "npx tsc"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }

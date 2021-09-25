@@ -1,14 +1,14 @@
 {
   "name": "common-file-system",
   "version": "0.0.1",
-  "description": "",
+  "description": "A file system library that can work with both real file systems and blob based file systems",
   "main": "dest/index.js",
   "browser": "dest/browser.js",
   "scripts": {
     "build": "npx tsc"
   },
   "author": "ashlin4010",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/mime-types": "^2.1.1",
     "@types/node": "^16.7.5",

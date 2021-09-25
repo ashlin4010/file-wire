@@ -10,4 +10,4 @@ npx lerna clean -y
 npx lerna bootstrap --hoist
 
 // build
-npx lerna run biuld
+npx lerna run build

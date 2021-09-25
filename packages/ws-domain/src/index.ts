@@ -1,2 +1,2 @@
-export { DomainConnection } from "./DomainConnection";
+export { DomainConnection, Proxy } from "./DomainConnection";
 export { WebSocketDomainServer }  from "./WebSocketDomainServer";
