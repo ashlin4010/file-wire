@@ -5,4 +5,3 @@ packages/testing
 packages/*/node_modules
 packages/*/dest
 packages/demo/*/dest/
-packages/demo/*/dest/*
