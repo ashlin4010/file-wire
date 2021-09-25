@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Random demos and testing",
   "main": "index.js",
   "author": "ashlin4010",
@@ -9,11 +9,11 @@
     "build": "cd ./fileSystem && node ./build.js && cd '../rtc connection' && node ./build.js"
   },
   "dependencies": {
-    "common-file-system": "^0.0.1",
+    "common-file-system": "^0.0.2",
     "express": "^4.17.1",
-    "rtc-connection": "^0.0.1",
-    "rtc-controller": "^0.0.1",
-    "ws-domain": "^0.0.1"
+    "rtc-connection": "^0.0.2",
+    "rtc-controller": "^0.0.2",
+    "ws-domain": "^0.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
