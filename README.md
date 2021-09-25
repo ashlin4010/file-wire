@@ -13,8 +13,10 @@ npm run build
 ```
 
 ## Demos
+```bash
+npm run build-demos
+```
 
-Coming Soon
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

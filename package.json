@@ -1,16 +1,17 @@
 {
-  "devDependencies": {
-    "lerna": "^4.0.0"
-  },
   "name": "file-wire",
-  "repository": "https://github.com/ashlin4010/file-wire.git",
   "author": "ashlin4010",
   "license": "MIT",
+  "repository": "https://github.com/ashlin4010/file-wire.git",
   "scripts": {
-    "build": "npx lerna run build",
+    "build": "npx lerna run build --ignore demo",
+    "build-demos": "npx lerna run build",
     "postinstall": "npx lerna bootstrap"
   },
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "lerna": "^4.0.0"
   }
 }

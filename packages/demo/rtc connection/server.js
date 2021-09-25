@@ -7,7 +7,7 @@ const server = http.createServer(app);
 const ds = new WebSocketDomainServer();
 
 
-app.use(express.static("public"));
+app.use(express.static("dest"));
 
 server.on('upgrade', function upgrade(request, socket, head) {
     const reqUrl = new URL(request.url, 'http://' + request.headers.host);

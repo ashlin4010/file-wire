@@ -38,7 +38,7 @@ button?.addEventListener("click", () => {
         let wsDuplex = new WsDuplex(ws);
         let RTC = new RTCConnection(wsDuplex, isInitiator , {});
 
-        if(isInitiator) RTC.addDataChannel("plz work");
+        if(isInitiator) RTC.createDataChannel("plz work");
 
         RTC.on("connect", () => {
             console.log("RTC open!");

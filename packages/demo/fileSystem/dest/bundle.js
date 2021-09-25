@@ -158,16 +158,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.directoryOpen = directoryOpen;
 
-var $$3 = _interopRequireDefault(require("./legacy/directory-open.mjs"));
+var $$1 = _interopRequireDefault(require("./legacy/directory-open.mjs"));
 
-var $$2 = _interopRequireDefault(require("./fs-access/directory-open.mjs"));
+var $$0 = _interopRequireDefault(require("./fs-access/directory-open.mjs"));
 
 var _supported = _interopRequireDefault(require("./supported.mjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // @license © 2020 Google LLC. Licensed under the Apache License, Version 2.0.
-const o = _supported.default ? Promise.resolve($$2) : Promise.resolve($$3);
+const o = _supported.default ? Promise.resolve($$0) : Promise.resolve($$1);
 
 async function directoryOpen(...r) {
   return (await o).default(...r);
@@ -204,16 +204,16 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.fileSave = fileSave;
 
-var $$1 = _interopRequireDefault(require("./legacy/file-save.mjs"));
+var $$3 = _interopRequireDefault(require("./legacy/file-save.mjs"));
 
-var $$0 = _interopRequireDefault(require("./fs-access/file-save.mjs"));
+var $$2 = _interopRequireDefault(require("./fs-access/file-save.mjs"));
 
 var _supported = _interopRequireDefault(require("./supported.mjs"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // @license © 2020 Google LLC. Licensed under the Apache License, Version 2.0.
-const s = _supported.default ? Promise.resolve($$0) : Promise.resolve($$1);
+const s = _supported.default ? Promise.resolve($$2) : Promise.resolve($$3);
 
 async function fileSave(...e) {
   return (await s).default(...e);

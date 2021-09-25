@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "ashlin4010",
   "license": "MIT",
+  "scripts": {
+    "build": "cd ./fileSystem && node ./build.js && cd '../rtc connection' && node ./build.js"
+  },
   "dependencies": {
     "common-file-system": "^0.0.1",
     "express": "^4.17.1",
