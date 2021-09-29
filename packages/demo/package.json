@@ -6,7 +6,7 @@
   "author": "ashlin4010",
   "license": "MIT",
   "scripts": {
-    "build": "cd ./fileSystem && node ./build.js && cd '../rtc connection' && node ./build.js"
+    "build": "node './rtc connection/build.js' && node ./fileSystem/build.js "
   },
   "dependencies": {
     "common-file-system": "^0.0.2",
