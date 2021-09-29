@@ -11,3 +11,6 @@ npx lerna bootstrap --hoist
 
 // build
 npx lerna run build
+
+
+sudo npm lerna publish
