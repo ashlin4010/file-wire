@@ -14,7 +14,7 @@
     "rtc-connection": "^0.0.2",
     "rtc-controller": "^0.0.2",
     "ws-domain": "^0.0.2",
-    "uuid": "^8.3.2",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
