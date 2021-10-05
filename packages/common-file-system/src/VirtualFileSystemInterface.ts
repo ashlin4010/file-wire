@@ -7,12 +7,6 @@ interface FileSystemStructure {
     [name: string] : FileSystemStructure | File;
 }
 
-interface Opts {
-    offset: number;
-    length: number;
-}
-type Callback = (err: Error | null, buffer?: ArrayBuffer) => void;
-
 export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
 
     isReadOnly: boolean;
@@ -23,26 +17,20 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
         this.fss = fileSystemStructure || null;
     }
 
-    read(path: string, options: {offset?: number, length?: number}, callback?: (err: Error | null, buffer?: ArrayBuffer) => void): void;
-    read(path: string, options: (err: Error | null, buffer?: ArrayBuffer) => void): void;
-    read(path: string, options: any, callback?: (err: Error | null, buffer?: ArrayBuffer) => void){
-        if(typeof options === "function"){
-            callback = options;
-            options = undefined;
-        }
-        let offset = options?.offset;
-        let length = options?.length;
-        let end = length === undefined ? undefined : offset === undefined ? length : offset + length;
+    read(path: string, options: {offset?: number, length?: number}): Promise<ArrayBuffer> {
+        return new Promise((resolve, reject) => {
+            let offset = options?.offset;
+            let length = options?.length;
+            let end = length === undefined ? undefined : offset === undefined ? length : offset + length;
 
-        if(callback) {
             path = Path.normalize(path);
             let fileObject: unknown = this.resolvePath(path, this.fss);
-            if (!this.isFile(fileObject)) callback(new Error("ENOENT: no such file or directory " + path), undefined);
+            if (!this.isFile(fileObject)) reject(new Error("ENOENT: no such file or directory " + path));
             else (fileObject as File).slice(offset, end).arrayBuffer()
-                .then(buffer => callback!(null, buffer))
-                .catch(error => callback!(error))
+                .then(buffer => resolve(buffer))
+                .catch(error =>reject(error))
             ;
-        }
+        });
     }
 
     createReadStream(path: string): stream.Readable {
@@ -52,41 +40,50 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
         throw new Error("ENOENT: no such file or directory " + path);
     }
 
-    readdir(path: string, callback: (err: (Error | null), files?: string[]) => void): void {
-        let err = null;
-        path = Path.normalize(path);
-        let fileObject = this.resolvePath(path, this.fss);
-        if(!this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
-        callback(err, !err ? Object.keys(fileObject) : undefined);
+    readdir(path: string): Promise<string[]> {
+
+        return new Promise((resolve, reject) => {
+            let err = null;
+            path = Path.normalize(path);
+            let fileObject = this.resolvePath(path, this.fss);
+            if(!this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
+
+            if(err) reject(err);
+            else resolve(Object.keys(fileObject));
+
+        });
     }
 
-    stat(path: string, callback: (err: (Error | null), stats?: Stats) => void): void {
-        let err = null;
-        path = Path.normalize(path);
-        let fileObject = this.resolvePath(path, this.fss);
-        if(!this.isFile(fileObject) && !this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
-        let name = Path.parse(path).base;
-        let stats;
-        if(this.isFile(fileObject)){
-            stats = {
-                name: name,
-                size: fileObject.size,
-                lastModified: fileObject.lastModified,
-                lastModifiedDate: fileObject.lastModifiedDate,
-                type: fileObject.type,
-                isDirectory: false
+    stat(path: string): Promise<Stats> {
+        return new Promise((resolve, reject) => {
+            let err = null;
+            path = Path.normalize(path);
+            let fileObject = this.resolvePath(path, this.fss);
+            if(!this.isFile(fileObject) && !this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
+            let name = Path.parse(path).base;
+            let stats;
+            if(this.isFile(fileObject)){
+                stats = {
+                    name: name,
+                    size: fileObject.size,
+                    lastModified: fileObject.lastModified,
+                    lastModifiedDate: fileObject.lastModifiedDate,
+                    type: fileObject.type,
+                    isDirectory: false
+                }
+            } else {
+                stats = {
+                    name: name,
+                    size: 0,
+                    lastModified: 0,
+                    lastModifiedDate: null,
+                    type: false,
+                    isDirectory: true
+                }
             }
-        } else {
-            stats = {
-                name: name,
-                size: 0,
-                lastModified: 0,
-                lastModifiedDate: null,
-                type: false,
-                isDirectory: true
-            }
-        }
-        callback(err, !err ? stats as Stats : undefined);
+            if(err) reject(err);
+            else resolve(stats as Stats);
+        });
     }
 
     cleanPath(path: string) {

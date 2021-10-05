@@ -68,33 +68,29 @@ export class RTCController extends EventEmitter {
         let fs = this.fs;
 
         // list directory content
-        function listDirectory(send: Function,command: ControlCommand, data: {path: string} | undefined) {
+        function listDirectory(send: Function, command: ControlCommand, data: {path: string} | undefined) {
             if (data?.path) {
-                fs.readdir(data.path, (err: any, files: any) => send({
-                    code: err ? ControlStatusCodes.INTERNAL_SERVER_ERROR : ControlStatusCodes.OK,
-                    data: files
-                }));
+                fs.readdir(data.path)
+                    .then((files:any) => send({code: ControlStatusCodes.OK, data: files}))
+                    .catch((e:any) => {send({code: ControlStatusCodes.INTERNAL_SERVER_ERROR})});
             } else send({code: ControlStatusCodes.BAD_REQUEST});
         }
 
         // delete directory
-        function deleteDirectory(send: Function,command: ControlCommand, data: {path: string} | undefined) {
+        function deleteDirectory(send: Function, command: ControlCommand, data: {path: string} | undefined) {
             if (data?.path) {
-                fs.rmdir(data.path, (err: any, files: any) => send({
-                    code: err ? ControlStatusCodes.INTERNAL_SERVER_ERROR : ControlStatusCodes.OK,
-                    message: err,
-                    data: files
-                }));
+                fs.rmdir(data.path)
+                    .then((files: any) => send({code: ControlStatusCodes.OK, data: files}))
+                    .catch((err: any) => send({code: ControlStatusCodes.INTERNAL_SERVER_ERROR, message: err}));
             } else send({code: ControlStatusCodes.BAD_REQUEST});
         }
 
         // delete file
         function deleteFile(send: Function,command: ControlCommand, data: {path: string} | undefined) {
             if (data?.path) {
-                fs.rm(data.path, (err: any, files: any) => send({
-                    code: err ? ControlStatusCodes.INTERNAL_SERVER_ERROR : ControlStatusCodes.OK,
-                    data: files
-                }));
+                fs.rm(data.path)
+                    .then((files: any) => send({code: ControlStatusCodes.OK, data: files}))
+                    .catch((err: any) => send({code: ControlStatusCodes.INTERNAL_SERVER_ERROR, message: err}));
             } else send({code: ControlStatusCodes.BAD_REQUEST});
         }
 
@@ -110,7 +106,6 @@ export class RTCController extends EventEmitter {
             case ControlCommand.DELETE_FILE: deleteFile(send, command, data); break;
         }
     }
-
 
 
     private createControlChannel(): ReqResChannel {

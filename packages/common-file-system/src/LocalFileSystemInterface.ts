@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as pfs from "fs/promises";
 import * as path from "path";
 import * as mime from "mime-types";
 import * as stream from "node:stream";
@@ -17,33 +18,30 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         this.isReadOnly = false;
     }
 
-    read(path: string, options: {offset: number, length: number}, callback?: (err: Error | null, buffer?: ArrayBuffer) => void): void;
-    read(path: string, options: (err: Error | null, buffer?: ArrayBuffer) => void): void;
-    read(path: string, options: any, callback?: (err: (Error | null), buffer?: ArrayBuffer) => void) {
-        if (typeof options === "function") {
-            callback = options;
-            options = undefined;
-        }
-        let offset: number = options?.offset | 0;
-        let length = options?.length;
+    read(path: string, options: {offset?: number, length?: number}): Promise<ArrayBuffer> {
+        return new Promise<ArrayBuffer>((resolve, reject) => {
+            let offset = options?.offset || 0;
+            let length = options?.length;
 
-        if (callback) {
             fs.stat(this.safePath(path), (err, stats) => {
-                if (err) callback!(err);
+                if (err) reject(err);
                 else fs.open(this.safePath(path), "r", (err, fd) => {
-                    if (err) callback!(err);
+                    if (err) reject(err);
                     else {
+                        length = length || stats.size;
                         let b = Buffer.alloc(length ? length : stats.size);
                         fs.read(fd, b, 0, length, offset, (err, bytesRead, buffer) => {
-                            if (err) callback!(err);
-                            else callback!(null, buffer);
+                            if (err) reject(err);
+                            else resolve(buffer);
                             fs.close(fd);
                         });
                     }
                 });
             });
-        }
+        });
     }
+
+
 
     createReadStream(path: string): stream.Readable {
         return fs.createReadStream(this.safePath(path));
@@ -53,43 +51,44 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         return fs.createWriteStream(this.safePath(path));
     }
 
-    readdir(path: string, callback: (err: (Error | null), files?: string[]) => void): void {
-        fs.readdir(this.safePath(path), callback);
+    readdir(path: string ): Promise<string[]> {
+        return pfs.readdir(this.safePath(path));
     }
 
-    rename(oldPath: string, newPath: string, callback: (err: (Error | null)) => void): void {
-        fs.rename(this.safePath(oldPath), this.safePath(newPath), callback);
+    rename(oldPath: string, newPath: string): Promise<void> {
+        return pfs.rename(this.safePath(oldPath), this.safePath(newPath));
     }
 
-    rm(path: string, callback: (err: (Error | null)) => void): void {
-        fs.rm(this.safePath(path), callback);
+    rm(path: string, options? : {recursive: boolean, force: boolean}): Promise<void> {
+       return pfs.rm(this.safePath(path), options);
     }
 
-    rmdir(path: string, callback: (err: (Error | null)) => void): void {
-        fs.rmdir(this.safePath(path), {recursive: true}, callback);
+    rmdir(path: string, options? : {recursive: boolean, force: boolean}): Promise<void> {
+        return pfs.rmdir(this.safePath(path), options);
     }
 
-    stat(path: string, callback: (err: (Error | null), stats?: Stats) => void): void {
-        let fileName = Path.parse(this.safePath(path)).base;
-        fs.stat(this.safePath(path), (err, stats) => {
-            if(err) callback(err);
-            else {
-                let newStats: Stats = {
-                    name: fileName,
-                    size: stats.size,
-                    lastModified: stats.mtimeMs,
-                    lastModifiedDate: stats.mtime,
-                    type: mime.lookup(fileName),
-                    isDirectory: stats.isDirectory()
+    stat(path: string): Promise<Stats> {
+        return new Promise((resolve, reject) => {
+            let fileName = Path.parse(this.safePath(path)).base;
+            fs.stat(this.safePath(path), (err, stats) => {
+                if(err) reject(err);
+                else {
+                    let newStats: Stats = {
+                        name: fileName,
+                        size: stats.size,
+                        lastModified: stats.mtimeMs,
+                        lastModifiedDate: stats.mtime,
+                        type: mime.lookup(fileName),
+                        isDirectory: stats.isDirectory()
+                    }
+                    resolve(newStats);
                 }
-                callback(err, newStats);
-            }
+            });
         });
     }
 
     safePath(unsafePath: string) {
         return path.join(this.rootPath, path.normalize(unsafePath).replace(/^(\.\.(\/|\\|$))+/, ''));
     }
-
 
 }
