@@ -1,6 +1,6 @@
 {
   "name": "common-file-system",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A file system library that can work with both real file systems and blob based file systems",
   "main": "dest/index.js",
   "browser": "dest/browser.js",
