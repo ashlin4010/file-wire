@@ -18,7 +18,7 @@ export default function Socket() {
 
         ws.on("message", (data) => {
             console.log("client:", data);
-            ws.send("ping");
+            //ws.send("ping");
         });
         ws.send("ping");
     });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
 import "./App.css";
 import NavBar from "./NavBar";
@@ -10,9 +10,7 @@ export default function App() {
     return (
         <Router>
             <NavBar/>
-
             <Link className={"icon-root"} to="/socket">Socket</Link>
-
             <Switch>
 
                 <Route path="/socket">
@@ -23,9 +21,19 @@ export default function App() {
                     <FileGrid/>
                 </Route>
 
-                <Route path="/">
-                    <DomainConnectMenu defaultValue={"demo"}/>
-                </Route>
+                <Route path="/" render={({history}) =>
+                    <DomainConnectMenu
+                        defaultValue={"testing"}
+                        onConnect={(domainAddress, openError) => {
+                            console.log("now we would open the ws connection");
+
+                            setTimeout(() => {
+                                // if (domainAddress) history.push(`/domain/${domainAddress}`);
+                                openError();
+                            }, 1000);
+                        }}
+                    />
+                }/>
             </Switch>
         </Router>
     );
