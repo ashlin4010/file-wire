@@ -2,17 +2,28 @@ import { DomainConnection } from "ws-domain";
 import { FileSystemInterface } from "common-file-system";
 import { RTCConnection, WsDuplex } from "rtc-connection";
 import { RTCController } from "rtc-controller";
-
 let url = "ws://127.0.0.1:8080";
 let isServer = true;
 let isInitiator = !isServer;
 let domain = "testing";
 let domainConnection;
 
+// start client
+log("Domain:", domain);
+log("URL:", url);
 log("Connecting to signalling server...");
+
 tryConnect().then(async (wsProxy) => {
     log("Connected to signalling server.");
     let ws = !isServer ? wsProxy : await new Promise((resolve, reject) => wsProxy.on("connection", resolve));
+
+    // loop
+    ws.on("message", (data: any) => {
+        console.log("client:", data);
+        ws.send("pong");
+    });
+
+
     let wsDuplex = new WsDuplex(ws);
 
     let fs = new FileSystemInterface("./");
@@ -40,7 +51,6 @@ function log(...data: any) {
 
 function tryConnect(maxRetries: number = 5): Promise<any>  {
     return new Promise((resolve, reject) => {
-
         let attempt = 0;
         let retry = setInterval(() => {
 
@@ -50,7 +60,6 @@ function tryConnect(maxRetries: number = 5): Promise<any>  {
                 log("Websocket connection failed to be established, the target might not be online, retrying in 1 second");
                 if(attempt > maxRetries) reject("Websocket connection failed to be established");
             });
-
             domainConnection.on("connect", async (wsProxy) => {
                 clearInterval(retry);
                 resolve(wsProxy);

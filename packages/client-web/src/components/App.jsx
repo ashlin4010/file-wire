@@ -4,17 +4,26 @@ import "./App.css";
 import NavBar from "./NavBar";
 import DomainConnectMenu from "./DomainConnectMenu";
 import FileGrid from "./FileGrid";
+import Socket from "./Socket";
 
 export default function App() {
     return (
         <Router>
             <NavBar/>
 
+            <Link className={"icon-root"} to="/socket">Socket</Link>
+
             <Switch>
+
+                <Route path="/socket">
+                    <Socket/>
+                </Route>
+
                 <Route path="/domain/:test">
                     <FileGrid/>
                 </Route>
-                <Route path="/*">
+
+                <Route path="/">
                     <DomainConnectMenu defaultValue={"demo"}/>
                 </Route>
             </Switch>

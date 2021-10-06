@@ -1,19 +1,21 @@
 {
-  "name": "client-cli",
+  "name": "file-wire-server",
   "version": "0.0.2",
-  "description": "Cli fileWire client",
+  "description": "FileWire.IO Server",
   "author": "ashlin4010",
   "license": "MIT",
-  "main": "dest/index.js",
+  "main": "server.js",
   "scripts": {
     "build": "npx tsc",
     "start": "node ./dest/index.js",
-    "watch": "tsnd --respawn index.ts"
+    "watch": "tsnd --respawn ./server.ts"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "@types/node": "^16.7.5",
-    "typescript": "^4.4.2",
-    "ts-node-dev": "^1.1.8"
+    "@types/uuid": "^8.3.1",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.2"
   },
   "dependencies": {
     "common-file-system": "^0.0.2",

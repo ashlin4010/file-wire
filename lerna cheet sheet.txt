@@ -2,7 +2,7 @@
 npx lerna clean -y
 
 // link node-modules
-npx lerna bootstrap --hoist
+npx --legacy-peer-deps lerna bootstrap --hoist
 
 //add sibling package to other package
 lerna add common-file-system packages/testing
