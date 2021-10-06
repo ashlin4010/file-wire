@@ -1,0 +1,31 @@
+.file-grid{
+    max-width: 80%;
+    margin-top: 20px;
+    border: solid;
+    margin-right: auto;
+    margin-left: auto;
+    gap: 25px;
+}
+
+.file-node{
+    user-select: none;
+    cursor: pointer;
+    text-align: center;
+    min-width: 80px;
+    inline-size: min-content;
+    overflow-wrap: anywhere;
+}
+
+.file-icon {
+    font-size: 3vmax;
+}
+
+.selected-text {
+    border-radius: 5px;
+    padding: 2px;
+    background-color: #275b95;
+}
+
+.selected-icon {
+    color: #275b95;
+}
