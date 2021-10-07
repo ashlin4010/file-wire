@@ -1,9 +1,8 @@
 import React, {useState} from "react";
 import {Grid, Icon, IconButton, SvgIcon} from "@mui/material";
 import "./FileGrid.css";
-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFolder, faFolderOpen, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode} from "@fortawesome/free-solid-svg-icons";
+import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode} from "@fortawesome/free-solid-svg-icons";
 import {faFileAudio} from "@fortawesome/free-solid-svg-icons/faFileAudio";
 import mime from "mime-types";
 

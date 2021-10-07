@@ -33,7 +33,7 @@ export class DomainPayload {
         return new DomainPayload(PayloadType.CONNECT, null, clientId).toString();
     }
 
-    static createDisconnectPayload(code: number | undefined | null, clientId: string): string {
+    static createDisconnectPayload(code: number | undefined | null, clientId?: string): string {
         return new DomainPayload(PayloadType.DISCONNECT, code, clientId).toString();
     }
 

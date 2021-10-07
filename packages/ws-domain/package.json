@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Websocket proxy",
   "main": "dest/index.js",
+  "types": "dest/index.d.ts",
   "author": "ashlin4010",
   "license": "MIT",
   "scripts": {

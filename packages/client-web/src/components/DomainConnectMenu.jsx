@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import { withStyles } from '@mui/styles';
+import { useHistory } from "react-router-dom";
 import {Box, Button, Grid, Paper, TextField, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import ErrorDialogConnection from "./ErrorDialogConnection";
@@ -33,19 +34,26 @@ const CssTextField = withStyles({
 })(TextField);
 
 export default function DomainConnectMenu(props) {
-    const {defaultValue, onConnect} = props
-    const [domainAddress, setDomainAddress] = useState(defaultValue);
+    const {defaultValue, onConnect, RTCController, domain} = props;
+    const history = useHistory();
+    const [currentDomainInput, SetCurrentDomainInput] = useState(defaultValue);
     const [loading, setLoading] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
+    const isConnected = RTCController !== null;
+
 
     const handleChange = (event) => {
-        setDomainAddress(event.target.value);
+        SetCurrentDomainInput(event.target.value);
     }
 
     const handleConnect = () => {
-        setLoading(true);
-        setErrorOpen(false);
-        if (onConnect) onConnect(domainAddress, openError);
+        if(isConnected) {
+            history.push(`/domain/${domain}`);
+        } else {
+            setLoading(true);
+            setErrorOpen(false);
+            if (onConnect) onConnect(currentDomainInput, openError);
+        }
     }
 
     const openError = () => {
@@ -82,15 +90,18 @@ export default function DomainConnectMenu(props) {
                         color="primary"
                         label="Domain"
                         variant="outlined"
-                        defaultValue={domainAddress}
+                        defaultValue={domain}
                         placeholder={"#Domain"}
+                        disabled={isConnected}
                     />
                     <CssLoadingButton
+                        disabled={currentDomainInput.length < 4}
                         onClick={handleConnect}
                         loading={loading}
                         variant="contained">
-                        Connect
+                        {isConnected ? "Resume" : "Connect"}
                     </CssLoadingButton>
+                    {isConnected && <Button color="error" style={{marginTop: 8}} variant="outlined">Disconnect</Button>}
                     <Button disabled style={{marginTop: 32}} variant="contained">Create New Domain</Button>
                     {/*<Button onClick={openError} style={{marginTop: 32}} variant="contained">Test Error</Button>*/}
                 </Grid>

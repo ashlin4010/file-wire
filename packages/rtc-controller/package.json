@@ -5,6 +5,7 @@
   "author": "ashlin4010",
   "license": "MIT",
   "main": "dest/index.js",
+  "types": "dest/index.d.ts",
   "scripts": {
     "build": "npx tsc"
   },

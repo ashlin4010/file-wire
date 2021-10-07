@@ -24,14 +24,14 @@ enum ControlStatusCodes {
     INTERNAL_SERVER_ERROR = 500
 }
 
-export declare interface RTCController {
+export interface RTCController {
+    constructor(rtc: RTCConnection, isServer: boolean, isInitiator: boolean, fileSystem: any): RTCController
     on(event: string, listener: Function): this;
     on(event: 'control', listener: (channel: ReqResChannel) => void): this;
 }
 
-
 export class RTCController extends EventEmitter {
-
+    
     readonly isServer: boolean;
     readonly isInitiator: boolean;
     readonly fs: any
@@ -49,7 +49,9 @@ export class RTCController extends EventEmitter {
         // else await the control channel
         this.rtc.on("datachannel", (channel) => this.handleDataChannel(channel));
         if(isInitiator) this.createControlChannel();
+
     }
+
 
     // handle new data channels including control channel
     private handleDataChannel(channel: RTCDataChannel) {

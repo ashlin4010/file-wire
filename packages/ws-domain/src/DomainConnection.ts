@@ -16,7 +16,6 @@ export interface Proxy {
     send(data: any): void;
 }
 
-
 type ErrorListener = (error: any) => void;
 type ConnectListener = (proxy: Proxy) => void;
 type DisconnectListener = (code: number, reason: string) => void;

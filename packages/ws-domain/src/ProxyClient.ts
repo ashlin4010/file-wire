@@ -33,4 +33,10 @@ export class ProxyClient extends EventEmitter {
     public send(message: any): void {
         this._ws.send(DomainPayload.createMessagePayload(message))
     }
+
+    public close(code?: number) {
+        this._ws.send(DomainPayload.createDisconnectPayload(code));
+        this._ws.close(code);
+    }
+
 }

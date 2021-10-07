@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A file system library that can work with both real file systems and blob based file systems",
   "main": "dest/index.js",
+  "types": "dest/index.d.ts",
   "browser": "dest/browser.js",
   "scripts": {
     "build": "npx tsc"

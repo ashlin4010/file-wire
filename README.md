@@ -12,9 +12,11 @@ npm install
 npm run build
 ```
 
-## Demos
+# Start Dev Server
+To start the dev server
 ```bash
-npm run build-demos
+npm run build
+npm run watch
 ```
 
 

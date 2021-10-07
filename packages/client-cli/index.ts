@@ -14,31 +14,32 @@ log("URL:", url);
 log("Connecting to signalling server...");
 
 tryConnect().then(async (wsProxy) => {
-    log("Connected to signalling server.");
-    let ws = !isServer ? wsProxy : await new Promise((resolve, reject) => wsProxy.on("connection", resolve));
+    log("Connected to signalling server");
+    if(isServer) {
+        wsProxy.on("connection", (ws: any) => {
+            log("Client has joint domain")
+            let wsDuplex = new WsDuplex(ws);
+            let fs = new FileSystemInterface("./");
+            let rtc = new RTCConnection(wsDuplex, isInitiator, {});
+            let controller = new RTCController(rtc, isServer, isInitiator, fs);
 
-    // loop
-    ws.on("message", (data: any) => {
-        console.log("client:", data);
-        ws.send("pong");
-    });
+            log("Establishing RTC connection...");
+            rtc.on("connect", () => log("RTC connection open"));
 
+            controller.on("control", (channel) => {
+                log("Control channel open and ready");
 
-    let wsDuplex = new WsDuplex(ws);
+                ws.close();
 
-    let fs = new FileSystemInterface("./");
-    let rtc = new RTCConnection(wsDuplex, isInitiator, {});
-    let controller = new RTCController(rtc, isServer, isInitiator, fs);
-
-    rtc.on("connect", () => log("RTC open!"));
-
-    controller.on("control", (channel) => {
-        log("Control open!");
-
-        channel.on("message", (message, send) => {
-            log(message);
+                channel.on("message", (message, send) => {
+                    log(message);
+                });
+            });
         });
-    });
+    }
+
+
+
 }).catch(() => {
     log("Failed to connect to signalling server, stopping");
     process.exit(0);

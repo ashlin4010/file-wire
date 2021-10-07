@@ -4,7 +4,8 @@ import * as EventEmitter from "events";
 
 const RTCPeerConnection: RTCPeerConnection = WebRTC.RTCPeerConnection;
 
-export declare interface RTCConnection {
+export interface RTCConnection {
+    new(duplex: Duplex, initiator: boolean, configuration: any): RTCConnection;
     on(event: string, listener: Function): this;
     on(event: 'datachannel', listener: (channel: RTCDataChannel) => void): this;
     on(event: 'connect', listener: (name: string) => void): this;
@@ -12,7 +13,6 @@ export declare interface RTCConnection {
 }
 
 export class RTCConnection extends EventEmitter {
-
     duplex: Duplex;
     initiator: boolean;
     configuration: any;
@@ -42,7 +42,7 @@ export class RTCConnection extends EventEmitter {
         this.RTCPeerConnection.onsignalingstatechange = this.handleSignalingStateChange.bind(this);
         this.RTCPeerConnection.onicecandidate = this.handleIceCandidate.bind(this);
         this.RTCPeerConnection.onnegotiationneeded = this.handleNegotiationNeeded.bind(this);
-
+        return this;
     }
 
     private handleDuplexData(data: any): void {
