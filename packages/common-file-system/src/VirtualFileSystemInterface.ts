@@ -60,8 +60,10 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
             path = Path.normalize(path);
             let fileObject = this.resolvePath(path, this.fss);
             if(!this.isFile(fileObject) && !this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
-            let name = Path.parse(path).base;
-            let stats;
+            let parsePath:any = Path.parse(path);
+            parsePath.full = path;
+            let name = parsePath.base;
+            let stats: any;
             if(this.isFile(fileObject)){
                 stats = {
                     name: name,
@@ -69,7 +71,8 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
                     lastModified: fileObject.lastModified,
                     lastModifiedDate: fileObject.lastModifiedDate,
                     type: fileObject.type,
-                    isDirectory: false
+                    isDirectory: false,
+                    path: parsePath,
                 }
             } else {
                 stats = {
@@ -78,7 +81,8 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
                     lastModified: 0,
                     lastModifiedDate: null,
                     type: false,
-                    isDirectory: true
+                    isDirectory: true,
+                    path: parsePath,
                 }
             }
             if(err) reject(err);

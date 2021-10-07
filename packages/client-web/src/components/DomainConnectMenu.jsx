@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { withStyles } from '@mui/styles';
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import {Box, Button, Grid, Paper, TextField, Typography} from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import ErrorDialogConnection from "./ErrorDialogConnection";
@@ -33,28 +33,42 @@ const CssTextField = withStyles({
     },
 })(TextField);
 
+function useQuery() {
+    return Object.fromEntries(new URLSearchParams(useLocation().search));
+}
+
 export default function DomainConnectMenu(props) {
-    const {defaultValue, onConnect, RTCController, domain} = props;
-    const history = useHistory();
-    const [currentDomainInput, SetCurrentDomainInput] = useState(defaultValue);
+    let {defaultValue, onConnect, RTCController, domain, setDomain} = props;
+    let {autoConnect, path, domain: queryDomain} = useQuery();
+    defaultValue = queryDomain ? queryDomain : defaultValue;
+    path = path ? path : "Lw==";
+    const [currentDomainInput, setCurrentDomainInput] = useState(defaultValue);
     const [loading, setLoading] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
+    const history = useHistory();
     const isConnected = RTCController !== null;
 
+    // http://localhost:3000/?autoConnect=true&path=Lw%3D%3D&domain=testing
 
     const handleChange = (event) => {
-        SetCurrentDomainInput(event.target.value);
+        setCurrentDomainInput(event.target.value);
     }
 
-    const handleConnect = () => {
+    const completeConnect = () => history.push(`/domain/${domain}/${path}`);
+
+    const beginConnect = () => {
         if(isConnected) {
-            history.push(`/domain/${domain}`);
+            completeConnect();
         } else {
             setLoading(true);
             setErrorOpen(false);
-            if (onConnect) onConnect(currentDomainInput, openError);
+            if (onConnect) onConnect(currentDomainInput, openError, completeConnect);
         }
     }
+
+    const disconnect = () => {
+        if(isConnected) RTCController.close();
+    };
 
     const openError = () => {
         setErrorOpen(true);
@@ -65,6 +79,8 @@ export default function DomainConnectMenu(props) {
         setLoading(false);
         setErrorOpen(false);
     }
+
+    useEffect(() => {if(autoConnect === "true") beginConnect()},[]);
 
     return (
         <Box
@@ -90,18 +106,18 @@ export default function DomainConnectMenu(props) {
                         color="primary"
                         label="Domain"
                         variant="outlined"
-                        defaultValue={domain}
+                        defaultValue={defaultValue}
                         placeholder={"#Domain"}
                         disabled={isConnected}
                     />
                     <CssLoadingButton
+                        onClick={beginConnect}
                         disabled={currentDomainInput.length < 4}
-                        onClick={handleConnect}
                         loading={loading}
                         variant="contained">
                         {isConnected ? "Resume" : "Connect"}
                     </CssLoadingButton>
-                    {isConnected && <Button color="error" style={{marginTop: 8}} variant="outlined">Disconnect</Button>}
+                    {isConnected && <Button onClick={disconnect} color="error" style={{marginTop: 8}} variant="outlined">Disconnect</Button>}
                     <Button disabled style={{marginTop: 32}} variant="contained">Create New Domain</Button>
                     {/*<Button onClick={openError} style={{marginTop: 32}} variant="contained">Test Error</Button>*/}
                 </Grid>
@@ -109,7 +125,7 @@ export default function DomainConnectMenu(props) {
             <ErrorDialogConnection
                 open={errorOpen}
                 onClose={closeError}
-                onRetry={handleConnect}
+                onRetry={beginConnect}
             />
         </Box>
     );

@@ -1,6 +1,7 @@
 import * as EventEmitter from "events";
 import type { RTCConnection } from "rtc-connection";
 import { ReqResChannel } from "./ReqResChannel";
+import * as Path from "path";
 
 const CONTROL_CHANNEL_LABEL = "CONTROL";
 
@@ -28,10 +29,10 @@ export interface RTCController {
     constructor(rtc: RTCConnection, isServer: boolean, isInitiator: boolean, fileSystem: any): RTCController
     on(event: string, listener: Function): this;
     on(event: 'control', listener: (channel: ReqResChannel) => void): this;
+    on(event: 'disconnect', listener: (name: string) => void): this;
 }
 
 export class RTCController extends EventEmitter {
-    
     readonly isServer: boolean;
     readonly isInitiator: boolean;
     readonly fs: any
@@ -48,10 +49,16 @@ export class RTCController extends EventEmitter {
         // if isInitiator begin connection
         // else await the control channel
         this.rtc.on("datachannel", (channel) => this.handleDataChannel(channel));
+
+        this.rtc.on("disconnect", () => this.emit("disconnect"));
+
         if(isInitiator) this.createControlChannel();
 
     }
 
+    close(): void {
+        this.rtc?.close();
+    }
 
     // handle new data channels including control channel
     private handleDataChannel(channel: RTCDataChannel) {
@@ -73,7 +80,15 @@ export class RTCController extends EventEmitter {
         function listDirectory(send: Function, command: ControlCommand, data: {path: string} | undefined) {
             if (data?.path) {
                 fs.readdir(data.path)
-                    .then((files:any) => send({code: ControlStatusCodes.OK, data: files}))
+                    .then((files: string[]) => {
+                        let pending: Promise<object>[] = [];
+                        files.forEach(file => {
+                            pending.push(fs.stat(Path.join(data.path, file)));
+                        });
+                        Promise.all(pending).then((files) => {
+                            send({code: ControlStatusCodes.OK, data: files});
+                        });
+                    })
                     .catch((e:any) => {send({code: ControlStatusCodes.INTERNAL_SERVER_ERROR})});
             } else send({code: ControlStatusCodes.BAD_REQUEST});
         }
