@@ -3,9 +3,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import {Link} from "react-router-dom";
 import "./NavBar.css";
 import logo from "./../assets/FileWire.svg";
-import React from "react";
+import React, {useState} from "react";
+import ShareDialogue from "./ShareDialogue";
 
 export default function NavBar() {
+
+    const [shareOpen, setShareOpen] = useState(false);
+
     return (
     <nav>
         <AppBar position="static">
@@ -33,10 +37,13 @@ export default function NavBar() {
                     </Grid>
 
                     <Grid item>
-                        <Button variant="contained" color="secondary" disableElevation>Share</Button>
+                        <Button onClick={() => setShareOpen(true)} variant="contained" color="secondary" disableElevation>Share</Button>
                     </Grid>
                 </Grid>
             </Toolbar>
         </AppBar>
+
+        <ShareDialogue open={shareOpen} setOpen={setShareOpen}/>
+
     </nav>);
 }

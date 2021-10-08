@@ -1,8 +1,7 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
 import React from "react";
-import {withStyles} from "@mui/styles";
+import NoShadowDialog from "./NoShadowDialog";
 
-const NoShadowTextDialog = withStyles({paper: {boxShadow: "none"}})(Dialog);
 
 export default function ErrorDialogConnection(props) {
     let {title, message, open, onClose, onRetry} = props;
@@ -12,7 +11,7 @@ export default function ErrorDialogConnection(props) {
         This may be because the share is off line or unavailable.`;
 
     return (
-        <NoShadowTextDialog open={open} onClose={onClose}>
+        <NoShadowDialog open={open} onClose={onClose}>
             <DialogTitle id="alert-dialog-title">
                 {title}
             </DialogTitle>
@@ -23,6 +22,6 @@ export default function ErrorDialogConnection(props) {
                 <Button onClick={onClose}>Close</Button>
                 <Button onClick={onRetry}>Retry</Button>
             </DialogActions>
-        </NoShadowTextDialog>
+        </NoShadowDialog>
     );
 }

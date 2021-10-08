@@ -89,7 +89,7 @@ export class RTCController extends EventEmitter {
                             send({code: ControlStatusCodes.OK, data: files});
                         });
                     })
-                    .catch((e:any) => {send({code: ControlStatusCodes.INTERNAL_SERVER_ERROR})});
+                    .catch((e:any) => {send({code: ControlStatusCodes.INTERNAL_SERVER_ERROR, message: e.toString()})});
             } else send({code: ControlStatusCodes.BAD_REQUEST});
         }
 
@@ -116,7 +116,6 @@ export class RTCController extends EventEmitter {
 
         }
 
-
         switch (command) {
             case ControlCommand.LIST_DIRECTORY: listDirectory(send, command, data); break;
             case ControlCommand.DELETE_DIRECTORY: deleteDirectory(send, command, data); break;
@@ -139,8 +138,13 @@ export class RTCController extends EventEmitter {
         return this.controlChannel.send({ command, data });
     }
 
-    getFiles(path: string) {
-        return this.sendCommand(ControlCommand.LIST_DIRECTORY, {path: path});
+    getFiles(path: string): Promise<{code: ControlStatusCodes, data: any, message: string}> {
+        return new Promise<{code: ControlStatusCodes, data: any, message: string}>((resolve, reject) => {
+            this.sendCommand(ControlCommand.LIST_DIRECTORY, {path: path}).then(({code, data, message}) => {
+                if(code !== ControlStatusCodes.OK) reject({code, data, message});
+                else resolve({code, data, message})
+            });
+        });
     }
 
     deleteFile(path: string) {

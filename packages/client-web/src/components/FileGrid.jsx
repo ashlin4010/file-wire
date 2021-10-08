@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Grid, Icon, IconButton, SvgIcon} from "@mui/material";
+import {Grid, Icon, IconButton, SvgIcon, Paper, Box} from "@mui/material";
 import "./FileGrid.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode} from "@fortawesome/free-solid-svg-icons";
@@ -19,7 +19,9 @@ export default function FileGrid(props) {
             />
         );
     });
-    return (<Grid className={"file-grid"} container direction={"row"}>{fileNodes}</Grid>);
+    return (
+        <Grid className={"file-grid"} container direction={"row"}>{fileNodes}</Grid>
+    );
 }
 
 
@@ -77,10 +79,30 @@ function FileNode(props) {
         let updated = {...files[fullPath], selected: isSelected};
         setFiles({...files, [fullPath]: updated});
     }
+    
+    function setSelectedAllInDirectory(path, selected = true) {
+        let directory = files[path];
 
-    function handleClick() {
+        console.log(directory.children);
+
+        let updated = {};
+
+        directory.children?.forEach((childPath) => {
+            let child = files[childPath];
+            if(child) updated[childPath] = {...child, selected: selected};
+        });
+
+        console.log(updated);
+        setFiles({...files, ...updated});
+    }
+
+    function handleClick(e) {
+        if(e.type === "dblclick") {
+            if(isDirectory) changeCurrentFolder();
+        }
+        //setSelectedAllInDirectory(file.path.dir,true)
         setSelected(!selected);
-        if(isDirectory) changeCurrentFolder();
+
     }
 
     function changeCurrentFolder() {
@@ -88,7 +110,7 @@ function FileNode(props) {
     }
 
     return (
-        <Grid item className={"file-node"} onClick={handleClick}>
+        <Grid item className={"file-node"} onDoubleClick={handleClick} onClick={handleClick}>
             <div className={"file-icon"}>
                 <FontAwesomeIcon className={selected ? "selected-icon" : ""} icon={getIcon()}/>
             </div>

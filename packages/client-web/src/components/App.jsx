@@ -5,6 +5,7 @@ import NavBar from "./NavBar";
 import DomainConnectMenu from "./DomainConnectMenu";
 import FileBrowser from "./FileBrowser";
 
+
 import { DomainConnection } from "ws-domain";
 import { WsDuplex, RTCConnection } from "rtc-connection";
 import { RTCController } from "rtc-controller";
@@ -77,9 +78,8 @@ export default function App() {
     return (
         <Router>
             <NavBar/>
-            <Link className={"icon-root"} to="/test">Test</Link>
+            <Link className={"icon-root"} to="/domain/testing/zzz">Bad Path</Link>
             <Switch>
-
                 <Route path="/domain/:domainAddress/:base64Path?">
                     <FileBrowser RTCController={controller} domain={domain}/>
                 </Route>

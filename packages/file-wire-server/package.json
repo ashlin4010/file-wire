@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "common-file-system": "^0.2.0",
+    "express": "^4.17.1",
     "rtc-connection": "^0.2.0",
     "rtc-controller": "^0.2.0",
     "ws-domain": "^0.2.0"

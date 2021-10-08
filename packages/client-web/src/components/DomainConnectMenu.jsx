@@ -39,7 +39,7 @@ function useQuery() {
 
 export default function DomainConnectMenu(props) {
     let {defaultValue, onConnect, RTCController, domain, setDomain} = props;
-    let {autoConnect, path, domain: queryDomain} = useQuery();
+    let {a: autoConnect, p:path, d: queryDomain} = useQuery();
     defaultValue = queryDomain ? queryDomain : defaultValue;
     path = path ? path : "Lw==";
     const [currentDomainInput, setCurrentDomainInput] = useState(defaultValue);
