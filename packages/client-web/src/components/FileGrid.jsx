@@ -1,39 +1,40 @@
 import React, {useState} from "react";
-import {Grid, Icon, IconButton, SvgIcon, Paper, Box} from "@mui/material";
+import {Grid} from "@mui/material";
 import "./FileGrid.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode} from "@fortawesome/free-solid-svg-icons";
 import {faFileAudio} from "@fortawesome/free-solid-svg-icons/faFileAudio";
 
 export default function FileGrid(props) {
-    const {path, files, setFileCache, setPath} = props;
+    const { fileStore, path, onSelect} = props;
 
-    let fileNodes = files[path]?.children?.map((filePath) => {
-        return (
-            <FileNode
-                key={filePath}
-                file={files[filePath]}
-                files={files}
-                setFiles={setFileCache}
-                setPath={setPath}
-            />
-        );
-    });
+    const handleSelect = ({file, event}) => {
+        onSelect({file, event});
+    }
+
     return (
-        <Grid className={"file-grid"} container direction={"row"}>{fileNodes}</Grid>
+        <Grid
+            container
+            className={"file-grid"}
+            direction={"row"}
+            onClick={(event) => handleSelect({file: null, event})}
+        >
+            {fileStore[path]?.children?.map((filePath) => <FileNode
+                key={filePath}
+                file={fileStore[filePath]}
+                onSelect={handleSelect}
+            />)}
+        </Grid>
     );
 }
 
-
 function FileNode(props) {
-    let {file, files, setFiles, setPath} = props;
-    let {name, selected} = file;
-    let fullPath = file.path.full;
-    const isDirectory = file.isDirectory;
+    const {file, onSelect} = props
+    const {name, selected, isDirectory, type: mineType} = file;
 
-    function getIcon() {
+    function getIcon(mineType) {
         if (isDirectory) return faFolder;
-        let mimeType = file.type || "application/octet-stream";
+        let mimeType = mineType || "application/octet-stream";
         let type = mimeType.split("/")[0];
         let format = mimeType.split("/")[1];
         let fileIcon;
@@ -75,46 +76,20 @@ function FileNode(props) {
         return fileIcon;
     }
 
-    function setSelected(isSelected) {
-        let updated = {...files[fullPath], selected: isSelected};
-        setFiles({...files, [fullPath]: updated});
-    }
-    
-    function setSelectedAllInDirectory(path, selected = true) {
-        let directory = files[path];
-
-        console.log(directory.children);
-
-        let updated = {};
-
-        directory.children?.forEach((childPath) => {
-            let child = files[childPath];
-            if(child) updated[childPath] = {...child, selected: selected};
-        });
-
-        console.log(updated);
-        setFiles({...files, ...updated});
-    }
-
-    function handleClick(e) {
-        if(e.type === "dblclick") {
-            if(isDirectory) changeCurrentFolder();
-        }
-        //setSelectedAllInDirectory(file.path.dir,true)
-        setSelected(!selected);
-
-    }
-
-    function changeCurrentFolder() {
-        setPath(fullPath);
+    function handleClick(event) {
+        if(event.type === "dblclick") {
+        } else onSelect({file, event});
     }
 
     return (
-        <Grid item className={"file-node"} onDoubleClick={handleClick} onClick={handleClick}>
-            <div className={"file-icon"}>
-                <FontAwesomeIcon className={selected ? "selected-icon" : ""} icon={getIcon()}/>
+        <Grid item className={"file-node"} >
+            <div>
+                <div onClick={handleClick} className={"file-icon"}>
+                    <FontAwesomeIcon className={selected ? "selected-icon" : ""} icon={getIcon(mineType)}/>
+                </div>
+                <a className={selected ? "selected-text" : ""}>{name}</a>
             </div>
-            <a className={selected ? "selected-text" : ""}>{name}</a>
+
         </Grid>
     );
 }

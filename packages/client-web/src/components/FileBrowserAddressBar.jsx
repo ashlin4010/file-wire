@@ -17,53 +17,50 @@ const CssTextField = withStyles({
 })(TextField);
 
 export default function FileBrowserAddressBar(props) {
-    const { path, changePath, changePathWithHistory,navHistory} = props;
-    const {addHistory, getHistory, getPreviousHistory, getNextHistory, moveBackHistory, moveForwardHistory} = navHistory;
+    const {
+        path,
+        onPathChange,
+        onLocationNext,
+        onLocationPrevious,
+        onLocationUp
+    } = props;
+
     const [displayPath, setDisplayPath] = useState(path);
 
     useEffect(() => {
         setDisplayPath(path);
     },[path]);
 
-    const handleChange = (e) => {
-        let value = e.target.value || "/";
+    const changeDisplayPath = (path) => {
+        let value = path || "/";
         value = value.startsWith("//") ? value.replace("//", "/") : value;
-        setDisplayPath(value)
+        setDisplayPath(value);
+    }
+
+    const handleChange = (e) => {
+        // allow the user to update DisplayPath
+        // but dont allow them to set it
+        changeDisplayPath(e.target.value);
     }
 
     const handleInputEnter = (e) => {
+        // allow the user to update DisplayPath
+        // but dont allow them to set it
+        // set display past should come from path
         if (e.key === 'Enter') {
             e.target.blur();
-            changePathWithHistory(e.target.value);
+            onPathChange(e.target.value);
+            changeDisplayPath(path);
         }
     }
 
-    const handleNavBack = () => {
-        let previous = getPreviousHistory();
-        if(previous !== false) {
-            changePath(previous);
-            moveBackHistory();
-        }
-    }
-    const handleNavForward = () => {
-        let next = getNextHistory();
-        if(next !== false) {
-            changePath(next);
-            moveForwardHistory();
-        }
-    }
-    const handleNavUp = () => {
-        if(path === "/") return;
-        let next = path.substring(0, path.lastIndexOf('/')) || "/";
-        changePathWithHistory(next);
-    }
 
     return (
         <Grid container >
             <ButtonGroup disableElevation variant="outlined" size={"small"} aria-label="outlined primary button group">
-                <Button onClick={handleNavBack}><ArrowBackIosIcon fontSize={"small"}/></Button>
-                <Button onClick={handleNavForward}><ArrowForwardIosIcon fontSize={"small"}/></Button>
-                <Button onClick={handleNavUp}><ArrowUpwardIcon fontSize={"medium"}/></Button>
+                <Button onClick={onLocationPrevious}><ArrowBackIosIcon fontSize={"small"}/></Button>
+                <Button onClick={onLocationNext}><ArrowForwardIosIcon fontSize={"small"}/></Button>
+                <Button onClick={onLocationUp}><ArrowUpwardIcon fontSize={"medium"}/></Button>
             </ButtonGroup>
             <Grid item sx={{ flexGrow: 1, paddingLeft: 2, paddingRight: 2 }}>
                 <CssTextField fullWidth focused hiddenLabel size={"small"} variant="standard" value={displayPath} onChange={handleChange} onKeyUp={handleInputEnter}/>

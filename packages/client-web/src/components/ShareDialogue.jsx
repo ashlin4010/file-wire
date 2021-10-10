@@ -51,7 +51,8 @@ export default function ShareDialogue(props) {
 
     const domainAddress = window.location.pathname.split("/")[2];
     const base64Path = window.location.pathname.split("/")[3];
-    const autoConnectURL = new URL(window.location.host);
+
+    const autoConnectURL = new URL(window.location.origin);
     if(domainAddress) autoConnectURL.searchParams.append("d", domainAddress);
     if(currentPath && base64Path) autoConnectURL.searchParams.append("p", base64Path);
     if(autoConnect && domainAddress) autoConnectURL.searchParams.append("a", autoConnect.toString());

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {Box, Paper, ButtonGroup, Button, TextField, FormGroup, Grid} from "@mui/material";
+import {Box, Paper} from "@mui/material";
 import { useHistory, useParams } from "react-router-dom";
 import { encode, decode } from 'js-base64';
 import FileGrid from "./FileGrid";
 import FileBrowserAddressBar from "./FileBrowserAddressBar";
-
 
 function safeDecode(string) {
     string = string || "";
@@ -25,76 +24,90 @@ function usePrevious(value) {
 }
 
 export default function FileBrowser(props) {
-    /** @type {RTCController} */
-    const RTCController = props.RTCController;
-    const history = useHistory();
+    const {
+        controller,
+        fileStore,
+        setFileStore,
+        onSelectionChange,
+        onPathChange,
+        onLocationNext,
+        onLocationPrevious,
+        onLocationUp
+    } = props;
 
-    // create and update files state
-    const [fileCache, setFileCache] = useState({});
+    const history = useHistory();
 
     // get, set, decode base64 path
     let { domainAddress, base64Path } = useParams();
-    const currentPath = safeDecode(base64Path) || null;
-    const prevPath = safeDecode(usePrevious(base64Path)) || "/";
-    const changePath = (path) => {
-        history.push(`/domain/${domainAddress}/${encode(path)}`);
-    }
-
-    // Navigation History
-    const [navigationHistory, setNavigationHistory] = useState([currentPath]);
-    const [navigationIndex, setNavigationIndex] = useState(0);
-    const addHistory = (path) => {
-        let nHis = navigationHistory.slice(0, navigationIndex + 1);
-        nHis.push(path);
-        setNavigationHistory(nHis);
-        setNavigationIndex(navigationIndex + 1);
-    }
-    const getHistory = () => navigationHistory[navigationIndex];
-    const getPreviousHistory = () => {
-        if(navigationIndex < 1) return false;
-        return navigationHistory[navigationIndex - 1];
-    }
-    const getNextHistory = () => {
-        if(navigationIndex + 1 >= navigationHistory.length) return false;
-        return navigationHistory[navigationIndex + 1];
-    }
-    const moveBackHistory  = () => {
-        if(navigationIndex < 1) return false;
-        setNavigationIndex(navigationIndex - 1);
-    }
-    const moveForwardHistory  = () => {
-        if(navigationIndex + 1 >= navigationHistory.length) return false;
-        setNavigationIndex(navigationIndex + 1);
-    }
-    const changePathWithHistory = (path) => {
-        changePath(path);
-        addHistory(path);
-    }
-    const navHistory = {addHistory, getHistory, getPreviousHistory, getNextHistory, moveBackHistory, moveForwardHistory};
-
+    const path = safeDecode(base64Path);
+    const prevPath = safeDecode(usePrevious(base64Path));
 
     const createReConnectLink = () => {
         const autoConnectURL = new URL(window.location.host);
         autoConnectURL.searchParams.append("a", "true");
         autoConnectURL.searchParams.append("d", domainAddress);
-        autoConnectURL.searchParams.append("p", base64Path);
+        if(base64Path) autoConnectURL.searchParams.append("p", base64Path);
         return (`/${autoConnectURL.search}`);
     }
-
-    // run on first component mount and each time the currentPath (base64Path) changes
-    useEffect(() => {
-        // if not connected return to home page or path
-        if (!base64Path || currentPath === null) return changePath("/");
-        if (RTCController === null) return history.push(createReConnectLink());
-
-        getFiles(currentPath).then(([files, parent]) => {
-            setFileCache({...fileCache, ...files, ...parent});
-        }).catch((e) => {
-            // if getFiles(path) has error than go to prevPath
-            console.error(e);
-            changePath(prevPath);
+    const changePath = (path, withHistory) => {
+        withHistory = withHistory === undefined ? true : withHistory;
+        onPathChange(path, withHistory, (accepted) => {
+            if(accepted) history.push(`/domain/${domainAddress}/${encode(path)}`);
         });
-    },[currentPath]);
+    }
+
+    //file selection
+    const [selected, setSelected] = useState({});
+    const [startSelect, setStartSelect] = useState(null);
+    const [endSelect, setEndSelect] = useState(null);
+    const select = (isSelected, paths) => {
+        paths = Array.isArray(paths) ? paths : [paths];
+        let updatedSelected = {};
+        paths.forEach((path) => selected[path] = {...fileStore[path], selected: isSelected});
+        setSelected({...selected, ...updatedSelected});
+    }
+    const pushSelected = () => setFileStore({...fileStore, ...selected});
+
+
+    const handleSelectionChange = ({file, event}) => {
+        event.stopPropagation();
+        let {shiftKey, ctrlKey} = event;
+        let rootFolder = fileStore[path];
+
+        if (!file) {
+            select(false, rootFolder.children);
+            pushSelected();
+            return;
+        }
+
+        if (!(shiftKey || ctrlKey)) select(false, rootFolder.children);
+        if (shiftKey) {
+            let startFile = startSelect || file;
+            let start = rootFolder.children.indexOf(startFile.path.full);
+            let end = rootFolder.children.indexOf(file.path.full);
+            if (endSelect) {
+                let oldEnd = rootFolder.children.indexOf(endSelect.path.full);
+                if (start !== oldEnd) select(false, rootFolder.children.slice(start, oldEnd + 1));
+                if (endSelect) select(false, rootFolder.children.slice(end, oldEnd + 1));
+            }
+            setEndSelect(file);
+            select(true, rootFolder.children.slice(start, end + 1));
+        }
+
+        select(!file.selected, file.path.full);
+        if (!(shiftKey)) setStartSelect(file);
+        pushSelected();
+
+    }
+
+    useEffect(() => {
+        if (controller === null) return history.push(createReConnectLink());
+        let startPath = path || "/";
+        onPathChange(startPath, true, (accepted) => {
+            accepted ? history.push(`/domain/${domainAddress}/${encode(startPath)}`) : changePath("/", true);
+        });
+    },[]);
+
 
     return (
         <Box
@@ -112,46 +125,22 @@ export default function FileBrowser(props) {
 
             <Paper style={{padding: 0}}>
                 <FileBrowserAddressBar
-                    path={currentPath}
-                    changePathWithHistory={changePathWithHistory}
-                    changePath={changePath}
-                    navHistory={navHistory}
+                    path={path}
+                    onPathChange={(path) => {changePath(path, true)}}
+                    onLocationNext={() => {onLocationNext("next", changePath)}}
+                    onLocationPrevious={() => {onLocationPrevious("previous", changePath)}}
+                    onLocationUp={() => onLocationUp("up", changePath)}
                 />
             </Paper>
 
             <Paper>
                 <FileGrid
-                    path={currentPath}
-                    files={fileCache}
-                    setFileCache={setFileCache}
-                    setPath={changePathWithHistory}
+                    path={path}
+                    fileStore={fileStore}
+                    onSelect={handleSelectionChange}
                 />
             </Paper>
          </Box>
     );
-
-
-    function getFiles(path) {
-        return new Promise((resolve, reject) => {
-            RTCController.getFiles(path)
-                .then(({code, data, message}) => {
-
-                    console.log(data);
-
-                    let newFiles = {};
-                    let parent = fileCache[path] || {name: path.split("/").pop(), path: {full: path}};
-                    data.forEach(file => {
-                        file["selected"] = false;
-                        file["children"] = null;
-                        newFiles[file.path.full] = file;
-                    });
-                    parent.children = Object.keys(newFiles);
-                    resolve([newFiles, {[path]: parent}])
-                })
-                .catch(({code, message}) => {
-                    reject(message);
-                });
-        });
-    }
 
 }

@@ -71,7 +71,7 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         return new Promise((resolve, reject) => {
             path = this.safePath(path);
             let parsePath:any = Path.parse("/" + path);
-            parsePath.full = Path.join(parsePath.dir,parsePath.base + parsePath.ext);
+            parsePath.full = Path.join(parsePath.dir,parsePath.base);
             let name = parsePath.base;
             fs.stat(this.safePath(path), (err, stats) => {
                 if(err) reject(err);

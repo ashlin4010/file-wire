@@ -61,7 +61,7 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
             let fileObject = this.resolvePath(path, this.fss);
             if(!this.isFile(fileObject) && !this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
             let parsePath:any = Path.parse("/" + path);
-            parsePath.full = Path.join(parsePath.dir,parsePath.base + parsePath.ext);
+            parsePath.full = Path.join(parsePath.dir,parsePath.base);
             let name = parsePath.base;
             let stats: any;
             if(this.isFile(fileObject)){

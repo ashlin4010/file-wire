@@ -6,3 +6,4 @@ packages/*/node_modules
 packages/*/dest
 packages/*/build
 packages/demo/*/dest/
+.env
