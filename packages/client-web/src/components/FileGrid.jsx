@@ -6,10 +6,22 @@ import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileA
 import {faFileAudio} from "@fortawesome/free-solid-svg-icons/faFileAudio";
 
 export default function FileGrid(props) {
-    const { fileStore, path, onSelect} = props;
+    const {
+        fileStore,
+        path,
+        onSelect,
+        onOpenClick
+    } = props;
+    let timer;
 
-    const handleSelect = ({file, event}) => {
-        onSelect({file, event});
+    const handleClick = ({file, event}) => {
+        event.stopPropagation();
+        clearTimeout(timer);
+        if (event.detail === 1) {
+            onSelect({file, directory: path, event});
+        } else if (event.detail === 2) {
+            onOpenClick({file, directory: path, event});
+        }
     }
 
     return (
@@ -17,12 +29,12 @@ export default function FileGrid(props) {
             container
             className={"file-grid"}
             direction={"row"}
-            onClick={(event) => handleSelect({file: null, event})}
+            onClick={(event) => onSelect({file: null, event})}
         >
             {fileStore[path]?.children?.map((filePath) => <FileNode
                 key={filePath}
                 file={fileStore[filePath]}
-                onSelect={handleSelect}
+                onSelect={handleClick}
             />)}
         </Grid>
     );
@@ -83,8 +95,8 @@ function FileNode(props) {
 
     return (
         <Grid item className={"file-node"} >
-            <div>
-                <div onClick={handleClick} className={"file-icon"}>
+            <div onClick={handleClick}>
+                <div className={"file-icon"}>
                     <FontAwesomeIcon className={selected ? "selected-icon" : ""} icon={getIcon(mineType)}/>
                 </div>
                 <a className={selected ? "selected-text" : ""}>{name}</a>

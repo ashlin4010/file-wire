@@ -1,27 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Box, Paper} from "@mui/material";
-import { useHistory, useParams } from "react-router-dom";
-import { encode, decode } from 'js-base64';
+import { useHistory } from "react-router-dom";
+import { encode } from 'js-base64';
 import FileGrid from "./FileGrid";
 import FileBrowserAddressBar from "./FileBrowserAddressBar";
+import useFileSelection from "../hooks/useFileSelection";
+import useBrowserArguments from "../hooks/useBrowserArguments";
 
-function safeDecode(string) {
-    string = string || "";
-    if(string === "") return "";
-    try {
-        return decode(string);
-    } catch (e) {
-        return "";
-    }
-}
-
-function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-        ref.current = value;
-    });
-    return ref.current;
-}
 
 export default function FileBrowser(props) {
     const {
@@ -36,19 +21,42 @@ export default function FileBrowser(props) {
     } = props;
 
     const history = useHistory();
+    const {domainAddress, path, createReConnectLink} = useBrowserArguments();
 
-    // get, set, decode base64 path
-    let { domainAddress, base64Path } = useParams();
-    const path = safeDecode(base64Path);
-    const prevPath = safeDecode(usePrevious(base64Path));
+    //file selection
+    const {handleSelection} = useFileSelection(fileStore, setFileStore);
+    // const [startSelect, setStartSelect] = useState(null);
+    // const [endSelect, setEndSelect] = useState(null);
+    // const handleSelectionChange = ({file, event}) => {
+    //     event.stopPropagation();
+    //     let {shiftKey, ctrlKey} = event;
+    //     let rootFolder = fileStore[path];
+    //
+    //     if (!file) {
+    //         select(false, rootFolder.children);
+    //         pushSelected();
+    //         return;
+    //     }
+    //
+    //     if (!(shiftKey || ctrlKey)) select(false, rootFolder.children);
+    //     if (shiftKey) {
+    //         let startFile = startSelect || file;
+    //         let start = rootFolder.children.indexOf(startFile.path.full);
+    //         let end = rootFolder.children.indexOf(file.path.full);
+    //         if (endSelect) {
+    //             let oldEnd = rootFolder.children.indexOf(endSelect.path.full);
+    //             if (start !== oldEnd) select(false, rootFolder.children.slice(start, oldEnd + 1));
+    //             if (endSelect) select(false, rootFolder.children.slice(end, oldEnd + 1));
+    //         }
+    //         setEndSelect(file);
+    //         select(true, rootFolder.children.slice(start, end + 1));
+    //     }
+    //
+    //     select(!file.selected, file.path.full);
+    //     if (!(shiftKey)) setStartSelect(file);
+    //     pushSelected();
+    // }
 
-    const createReConnectLink = () => {
-        const autoConnectURL = new URL(window.location.host);
-        autoConnectURL.searchParams.append("a", "true");
-        autoConnectURL.searchParams.append("d", domainAddress);
-        if(base64Path) autoConnectURL.searchParams.append("p", base64Path);
-        return (`/${autoConnectURL.search}`);
-    }
     const changePath = (path, withHistory) => {
         withHistory = withHistory === undefined ? true : withHistory;
         onPathChange(path, withHistory, (accepted) => {
@@ -56,55 +64,20 @@ export default function FileBrowser(props) {
         });
     }
 
-    //file selection
-    const [selected, setSelected] = useState({});
-    const [startSelect, setStartSelect] = useState(null);
-    const [endSelect, setEndSelect] = useState(null);
-    const select = (isSelected, paths) => {
-        paths = Array.isArray(paths) ? paths : [paths];
-        let updatedSelected = {};
-        paths.forEach((path) => selected[path] = {...fileStore[path], selected: isSelected});
-        setSelected({...selected, ...updatedSelected});
+    const handleOpen = ({file, directory, event}) => {
+        console.log("open", file.name, file.type);
+        if(file.isDirectory) changePath(file.path.full, true)
     }
-    const pushSelected = () => setFileStore({...fileStore, ...selected});
 
-
-    const handleSelectionChange = ({file, event}) => {
-        event.stopPropagation();
-        let {shiftKey, ctrlKey} = event;
-        let rootFolder = fileStore[path];
-
-        if (!file) {
-            select(false, rootFolder.children);
-            pushSelected();
-            return;
-        }
-
-        if (!(shiftKey || ctrlKey)) select(false, rootFolder.children);
-        if (shiftKey) {
-            let startFile = startSelect || file;
-            let start = rootFolder.children.indexOf(startFile.path.full);
-            let end = rootFolder.children.indexOf(file.path.full);
-            if (endSelect) {
-                let oldEnd = rootFolder.children.indexOf(endSelect.path.full);
-                if (start !== oldEnd) select(false, rootFolder.children.slice(start, oldEnd + 1));
-                if (endSelect) select(false, rootFolder.children.slice(end, oldEnd + 1));
-            }
-            setEndSelect(file);
-            select(true, rootFolder.children.slice(start, end + 1));
-        }
-
-        select(!file.selected, file.path.full);
-        if (!(shiftKey)) setStartSelect(file);
-        pushSelected();
-
-    }
 
     useEffect(() => {
         if (controller === null) return history.push(createReConnectLink());
-        let startPath = path || "/";
-        onPathChange(startPath, true, (accepted) => {
-            accepted ? history.push(`/domain/${domainAddress}/${encode(startPath)}`) : changePath("/", true);
+        onPathChange(path, true, (accepted) => {
+            if(accepted) {
+                history.push(`/domain/${domainAddress}/${encode(path)}`);
+            } else {
+                changePath("/", true);
+            }
         });
     },[]);
 
@@ -137,10 +110,10 @@ export default function FileBrowser(props) {
                 <FileGrid
                     path={path}
                     fileStore={fileStore}
-                    onSelect={handleSelectionChange}
+                    onOpenClick={handleOpen}
+                    onSelect={handleSelection}
                 />
             </Paper>
          </Box>
     );
-
 }

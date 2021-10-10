@@ -76,7 +76,7 @@ export default function App() {
                 completeConnect();
             })
             .catch(() => {
-                setTimeout(openError, 600)
+                setTimeout(openError, 600);
             });
     }
 
@@ -92,17 +92,14 @@ export default function App() {
     }
 
     const handleLocationChange = (direction, changePath) => {
-        console.log(direction, navHistory.next());
         if(direction === "next" && navHistory.next()) {
             handlePathChange(navHistory.next(), false,(accepted) => {
-                console.log(direction, "nav accepted:", accepted);
                 changePath(navHistory.next(),false);
                 if(accepted) navHistory.goForward();
             });
         }
         else if(direction === "previous" && navHistory.previous()){
             handlePathChange(navHistory.previous(), false,(accepted) => {
-                console.log(direction, "nav accepted:", accepted);
                 changePath(navHistory.previous(), false);
                 if(accepted) navHistory.goBack();
             });

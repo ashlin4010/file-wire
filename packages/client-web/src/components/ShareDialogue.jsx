@@ -2,7 +2,6 @@ import * as React from 'react';
 import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Snackbar, Button} from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
-
 import QRCode from "qrcode.react";
 import NoShadowDialog from "./NoShadowDialog";
 import {useState} from "react";
