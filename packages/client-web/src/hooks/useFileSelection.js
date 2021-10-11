@@ -13,7 +13,7 @@ export default function useFileSelection(fileStore, setFileStore) {
         setSelected({...selected, ...updatedSelected});
     }
     const pushSelected = () => setFileStore({...fileStore, ...selected});
-
+    const getSelected = () => Object.values(selected).filter((file) => file.selected);
     const handleSelection = ({file, directory, event}) => {
         event.stopPropagation();
         let {shiftKey, ctrlKey} = event;
@@ -23,6 +23,12 @@ export default function useFileSelection(fileStore, setFileStore) {
             select(false, rootFolder.children);
             pushSelected();
             return;
+        }
+
+        // if right click and have already have many files selected do nothing
+        if(event.detail === 0) {
+            let selected = new Set(getSelected());
+            if(selected.has(file)) return;
         }
 
         if (!(shiftKey || ctrlKey)) select(false, rootFolder.children);
@@ -44,5 +50,6 @@ export default function useFileSelection(fileStore, setFileStore) {
         pushSelected();
     }
 
-    return {select, pushSelected, handleSelection};
+
+    return {select, pushSelected, handleSelection, getSelected: getSelected, setSelected};
 }

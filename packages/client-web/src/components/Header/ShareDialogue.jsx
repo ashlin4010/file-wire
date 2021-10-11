@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Snackbar, Button} from '@mui/material';
+import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Snackbar} from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import QRCode from "qrcode.react";
-import NoShadowDialog from "./NoShadowDialog";
+import NoShadowDialog from "../NoShadowDialog";
 import {useState} from "react";
 
 
@@ -48,11 +48,13 @@ export default function ShareDialogue(props) {
     const [copySnackbarOpen, setCopySnackbarOpen] = useState(false);
     const [copySuccessful, setCopySuccessful] = useState(true);
 
+    const route = window.location.pathname.split("/")[1];
     const domainAddress = window.location.pathname.split("/")[2];
     const base64Path = window.location.pathname.split("/")[3];
 
     const autoConnectURL = new URL(window.location.origin);
     if(domainAddress) autoConnectURL.searchParams.append("d", domainAddress);
+    if(route) autoConnectURL.searchParams.append("r", route);
     if(currentPath && base64Path) autoConnectURL.searchParams.append("p", base64Path);
     if(autoConnect && domainAddress) autoConnectURL.searchParams.append("a", autoConnect.toString());
     const shareLink = `${window.location.origin}/${autoConnectURL.search}`;

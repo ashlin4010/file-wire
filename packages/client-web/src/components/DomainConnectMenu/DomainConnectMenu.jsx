@@ -38,23 +38,26 @@ function useQuery() {
 }
 
 export default function DomainConnectMenu(props) {
-    let {defaultValue, onConnect, RTCController, domain, setDomain} = props;
-    let {a: autoConnect, p:path, d: queryDomain} = useQuery();
+    let {defaultValue, onConnect, RTCController, domain} = props;
+    let {a: autoConnect, p:path, d: queryDomain, r: route} = useQuery();
     defaultValue = queryDomain ? queryDomain : defaultValue;
     path = path ? path : "Lw==";
+    route = route ? route : "domain";
     const [currentDomainInput, setCurrentDomainInput] = useState(defaultValue);
     const [loading, setLoading] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
     const history = useHistory();
     const isConnected = RTCController !== null;
 
-    // http://localhost:3000/?autoConnect=true&path=Lw%3D%3D&domain=testing
+    // http://localhost:3000/?a=true&p=Lw%3D%3D&domain=testing
 
     const handleChange = (event) => {
         setCurrentDomainInput(event.target.value);
     }
 
-    const completeConnect = () => history.push(`/domain/${domain}/${path}`);
+    const completeConnect = () => {
+        history.push(`/${route}/${domain}/${path}`);
+    };
 
     const beginConnect = () => {
         if(isConnected) {
@@ -80,7 +83,9 @@ export default function DomainConnectMenu(props) {
         setErrorOpen(false);
     }
 
-    useEffect(() => {if(autoConnect === "true") beginConnect()},[]);
+    useEffect(() => {
+        if(autoConnect === "true") beginConnect();
+    },[]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <Box
@@ -119,7 +124,6 @@ export default function DomainConnectMenu(props) {
                     </CssLoadingButton>
                     {isConnected && <Button onClick={disconnect} color="error" style={{marginTop: 8}} variant="outlined">Disconnect</Button>}
                     <Button disabled style={{marginTop: 32}} variant="contained">Create New Domain</Button>
-                    {/*<Button onClick={openError} style={{marginTop: 32}} variant="contained">Test Error</Button>*/}
                 </Grid>
             </Paper>
             <ErrorDialogConnection

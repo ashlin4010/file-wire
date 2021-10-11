@@ -13,6 +13,7 @@ type pendingRequestTable = {
 export declare interface ReqResChannel {
     on(event: string, listener: Function): this;
     on(event: 'message', listener: (data: any, send: (data: any) => void) => void): this;
+    on(event: 'open', listener: (channel: ReqResChannel) => void): this;
 }
 
 export class ReqResChannel extends EventEmitter{
@@ -30,6 +31,11 @@ export class ReqResChannel extends EventEmitter{
         this.isReceiver = receiver;
         this.pendingRequests = {};
         this.channel.onmessage = this.handleMessage.bind(this);
+        this.channel.onopen = this.handleOpen.bind(this);
+    }
+
+    handleOpen(ev: Event): void {
+        this.emit("open", this);
     }
 
     handleMessage(e: MessageEvent) {

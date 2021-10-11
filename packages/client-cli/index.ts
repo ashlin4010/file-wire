@@ -3,6 +3,7 @@ import { FileSystemInterface } from "common-file-system";
 import { RTCConnection, WsDuplex } from "rtc-connection";
 import { RTCController } from "rtc-controller";
 let url = "ws://127.0.0.1:8080";
+let path = "./testdata"
 let isServer = true;
 let isInitiator = !isServer;
 let domain = "testing";
@@ -19,7 +20,7 @@ tryConnect().then(async (wsProxy) => {
         wsProxy.on("connection", (ws: any) => {
             log("Client has joint domain")
             let wsDuplex = new WsDuplex(ws);
-            let fs = new FileSystemInterface("./");
+            let fs = new FileSystemInterface(path);
             let rtc = new RTCConnection(wsDuplex, isInitiator, {});
             let controller = new RTCController(rtc, isServer, isInitiator, fs);
 
@@ -28,12 +29,10 @@ tryConnect().then(async (wsProxy) => {
 
             controller.on("control", (channel) => {
                 log("Control channel open and ready");
-
                 ws.close();
-
-                channel.on("message", (message, send) => {
-                    log(message);
-                });
+                // channel.on("message", (message, send) => {
+                //     log(message);
+                // });
             });
         });
     }

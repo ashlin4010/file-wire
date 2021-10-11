@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {Grid} from "@mui/material";
 import "./FileGrid.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -10,18 +10,25 @@ export default function FileGrid(props) {
         fileStore,
         path,
         onSelect,
-        onOpenClick
+        onOpenClick,
+        onContextMenu
     } = props;
     let timer;
 
     const handleClick = ({file, event}) => {
         event.stopPropagation();
         clearTimeout(timer);
-        if (event.detail === 1) {
+        if (event.detail === 1 || event.detail === 0) {
             onSelect({file, directory: path, event});
         } else if (event.detail === 2) {
             onOpenClick({file, directory: path, event});
         }
+    }
+
+    const handleContextMenu = ({file, event})  => {
+        event.stopPropagation();
+        onSelect({file, directory: path, event});
+        onContextMenu({file, directory: path, event});
     }
 
     return (
@@ -29,19 +36,21 @@ export default function FileGrid(props) {
             container
             className={"file-grid"}
             direction={"row"}
-            onClick={(event) => onSelect({file: null, event})}
+            onClick={(event) => onSelect({file: null, directory: path, event})}
+            onContextMenu={(event) => handleContextMenu({file: null, event})}
         >
             {fileStore[path]?.children?.map((filePath) => <FileNode
                 key={filePath}
                 file={fileStore[filePath]}
                 onSelect={handleClick}
+                onContextMenu={handleContextMenu}
             />)}
         </Grid>
     );
 }
 
 function FileNode(props) {
-    const {file, onSelect} = props
+    const {file, onSelect, onContextMenu} = props
     const {name, selected, isDirectory, type: mineType} = file;
 
     function getIcon(mineType) {
@@ -89,19 +98,23 @@ function FileNode(props) {
     }
 
     function handleClick(event) {
-        if(event.type === "dblclick") {
-        } else onSelect({file, event});
+        onSelect({file, event});
+    }
+
+    function handleContextMenu(event) {
+        event.stopPropagation();
+        onSelect({file, event});
+        onContextMenu({file, event});
     }
 
     return (
         <Grid item className={"file-node"} >
-            <div onClick={handleClick}>
+            <div onClick={handleClick} onContextMenu={handleContextMenu}>
                 <div className={"file-icon"}>
                     <FontAwesomeIcon className={selected ? "selected-icon" : ""} icon={getIcon(mineType)}/>
                 </div>
-                <a className={selected ? "selected-text" : ""}>{name}</a>
+                <p className={selected ? "selected-text" : ""}>{name}</p>
             </div>
-
         </Grid>
     );
 }

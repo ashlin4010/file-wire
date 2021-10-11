@@ -1,6 +1,6 @@
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
+import {Button, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import React from "react";
-import NoShadowDialog from "./NoShadowDialog";
+import NoShadowDialog from "../NoShadowDialog";
 
 
 export default function ErrorDialogConnection(props) {

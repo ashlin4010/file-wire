@@ -28,6 +28,7 @@
     "react-scripts": "4.0.3",
     "rtc-connection": "^0.3.0",
     "rtc-controller": "^0.3.0",
+    "streamsaver": "^2.0.5",
     "ws-domain": "^0.3.0"
   },
   "scripts": {

@@ -1,16 +1,19 @@
-import React, {useState} from "react";
-import {BrowserRouter as Router, Switch, Route, Link, useLocation} from "react-router-dom";
-import useNavigationHistory from "../hooks/useNavigationHistory";
-import "./App.css";
-import NavBar from "./NavBar";
-import DomainConnectMenu from "./DomainConnectMenu";
-import FileBrowser from "./FileBrowser";
-
-
 import { DomainConnection } from "ws-domain";
 import { WsDuplex, RTCConnection } from "rtc-connection";
 import { RTCController } from "rtc-controller";
 import { FileSystemInterface } from "common-file-system";
+
+import React, {useState} from "react";
+import {Router, Switch, Route} from "react-router-dom";
+import history from "../history";
+import useNavigationHistory from "../hooks/useNavigationHistory";
+
+import NavBar from "./Header/NavBar";
+import DomainConnectMenu from "./DomainConnectMenu/DomainConnectMenu";
+import FileBrowser from "./FileBrowser/FileBrowser";
+import ImageViewer from "./ImageViewer/ImageViewer";
+import "./App.css";
+
 
 function createDomainConnection(url, domain) {
     return new Promise((resolve, reject) => {
@@ -56,15 +59,12 @@ function tryConnect(url, domainAddress, isInitiator, isServer) {
 
 
 export default function App() {
-
-    /** @type {RTCController} */
-    const initialState = null;
-    const [controller, setController] = useState(initialState);
+    const [controller, setController] = useState(null);
     const [fileStore, setFileStore] = useState({});
     const [domain, setDomain] = useState("testing");
     const navHistory = useNavigationHistory();
 
-    const handleConnectClick = (domainAddress, openError, completeConnect, history) => {
+    const handleConnectClick = (domainAddress, openError, completeConnect) => {
         //let link = window.location.href.replace("http", "ws");
         tryConnect("ws://localhost:8080", domainAddress, true, false)
             .then(controller => {
@@ -80,86 +80,37 @@ export default function App() {
             });
     }
 
-    const handlePathChange = (path, withHistory, acceptPathChange) => {
-        getFiles(path).then(([files, parent]) => {
-            setFileStore({...fileStore, ...files, ...parent});
-            if(withHistory) navHistory.add(path);
-            acceptPathChange(true);
-        }).catch((e) => {
-            console.error(e);
-            acceptPathChange(false);
-        });
-    }
-
-    const handleLocationChange = (direction, changePath) => {
-        if(direction === "next" && navHistory.next()) {
-            handlePathChange(navHistory.next(), false,(accepted) => {
-                changePath(navHistory.next(),false);
-                if(accepted) navHistory.goForward();
-            });
-        }
-        else if(direction === "previous" && navHistory.previous()){
-            handlePathChange(navHistory.previous(), false,(accepted) => {
-                changePath(navHistory.previous(), false);
-                if(accepted) navHistory.goBack();
-            });
-        }
-        else if(direction === "up"){
-            let path = navHistory.get();
-            if(!path || path === "/") return;
-            let next = path.substring(0, path.lastIndexOf('/')) || "/";
-            changePath(next, true);
-        }
-    }
-
-    const getFiles = (path) => {
-        return new Promise((resolve, reject) => {
-            controller.getFiles(path)
-                .then(({data}) => {
-                    let parent = fileStore[path] || {name: (path === "/") ? "/" : path.split("/").pop(), path: {full: path}};
-                    let newFiles = {};
-                    data.forEach(file => {
-                        file["selected"] = false;
-                        file["children"] = null;
-                        newFiles[file.path.full] = file;
-                    });
-                    parent["children"] = Object.keys(newFiles);
-                    parent["TTL"] = 5;
-                    resolve([newFiles, {[path]: parent}])
-                })
-                .catch(({message}) => {
-                    reject(message);
-                });
-        });
-    }
 
     return (
-        <Router>
+        <Router history={history}>
             <NavBar/>
-            {/*<Link className={"icon-root"} to="/domain/testing/zzz">Bad Path</Link>*/}
             <Switch>
                 <Route path="/domain/:domainAddress/:base64Path?">
+
                     <FileBrowser
                         controller={controller}
+                        domain={domain}
                         fileStore={fileStore}
                         setFileStore={setFileStore}
-                        onSelectionChange
-                        onPathChange={handlePathChange}
-                        onLocationNext={handleLocationChange}
-                        onLocationPrevious={handleLocationChange}
-                        onLocationUp={handleLocationChange}
+                        navHistory={navHistory}
                     />
                 </Route>
 
-                <Route path="/*" render={({history}) =>
+                <Route path="/image/:domainAddress/:base64Path?">
+                    <ImageViewer
+                        controller={controller}
+                        fileStore={fileStore}
+                    />
+                </Route>
+
+                <Route path="/*">
                     <DomainConnectMenu
                         RTCController={controller}
                         defaultValue={domain}
                         domain={domain}
-                        setDomain={setDomain}
-                        onConnect={(domainAddress, openError, completeConnect)=> handleConnectClick(domainAddress, openError,completeConnect, history)}
+                        onConnect={handleConnectClick}
                     />
-                }/>
+                </Route>
             </Switch>
         </Router>
     );

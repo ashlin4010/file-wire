@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Grid, Icon, IconButton, SvgIcon} from "@mui/material";
+import {Grid, Icon, IconButton} from "@mui/material";
 import "./FileTree.css";
 import mime from "mime-types";
 
@@ -110,7 +110,6 @@ function FileDropDown(props) {
 
     return (<div>
         <Grid className={selected ? "selected" : ""} container alignItems="center">
-            {/* Dropdown button*/}
             <IconButton
                 color="primary"
                 disabled={!isFolder}
@@ -119,7 +118,6 @@ function FileDropDown(props) {
                 {isFolder ? (open ? <ExpandMoreIcon/> : <ChevronRightIcon/>) : <Icon/>}
             </IconButton>
 
-            {/* file name */}
             <Grid item className={"dropdown-label"} onClick={() => setSelected(!selected)}>
                 <Grid container alignItems="center">
                     <Icon>{getIcon()}</Icon>
