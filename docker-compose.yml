@@ -1,11 +1,9 @@
 version: '2'
 services:
   web:
-#    user: "node"
-#    working_dir: /usr/app
     build: .
     command: npm run start-server
     volumes:
-      - .:/usr/app/
+      - .:/home/node
     ports:
       - "8080:8080"
