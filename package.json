@@ -6,9 +6,8 @@
   "scripts": {
     "build": "npx lerna run build --ignore demo --ignore client-web",
     "build-demos": "npx lerna run build",
-    "postinstall": "npx lerna bootstrap",
     "watch": "npx lerna run --parallel watch --scope '{file-wire-server,client-cli,client-web}'",
-    "build-server": "npx lerna run build --ignore demo && cp -r ./packages/client-web/build ./packages/file-wire-server/dest/public",
+    "build-server": "npx lerna run build --ignore demo",
     "start-server": "npx lerna run --parallel start --scope file-wire-server"
   },
   "devDependencies": {
