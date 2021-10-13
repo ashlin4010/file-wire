@@ -7,9 +7,15 @@
     "build": "npx lerna run build --ignore demo --ignore client-web",
     "build-demos": "npx lerna run build",
     "postinstall": "npx lerna bootstrap",
-    "watch": "npx lerna run --parallel watch --scope '{file-wire-server,client-cli,client-web}'"
+    "watch": "npx lerna run --parallel watch --scope '{file-wire-server,client-cli,client-web}'",
+    "build-server": "npx lerna run build --ignore demo && cp -r ./packages/client-web/build ./packages/file-wire-server/dest/public",
+    "start-server": "npx lerna run --parallel start --scope file-wire-server"
   },
   "devDependencies": {
     "lerna": "^4.0.0"
+  },
+  "dependencies": {
+    "@types/node": "^16.10.5",
+    "typescript": "^4.4.3"
   }
 }

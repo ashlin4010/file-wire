@@ -30,9 +30,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
 
 server.listen(8080, () => {
     log("http://localhost:8080");
-    log("http://localhost:8080#server");
 });
-
 
 function log(...data: any) {
     console.log("[Server]:", ...data);

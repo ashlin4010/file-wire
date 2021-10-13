@@ -65,8 +65,9 @@ export default function App() {
     const navHistory = useNavigationHistory();
 
     const handleConnectClick = (domainAddress, openError, completeConnect) => {
-        //let link = window.location.href.replace("http", "ws");
-        tryConnect("ws://localhost:8080", domainAddress, true, false)
+        let link = window.location.href.replace("http", "ws");
+        // "ws://localhost:8080"
+        tryConnect(link, domainAddress, true, false)
             .then(controller => {
                 controller.on("disconnect", () => {
                     setController(null);

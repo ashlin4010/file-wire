@@ -3,7 +3,6 @@ import type { RTCConnection } from "rtc-connection";
 import { ReqResChannel } from "./ReqResChannel";
 import { StreamSenderChannel } from "./StreamChannel"
 import * as Path from "path";
-import * as createDataStream from 'rtc-dcstream';
 import { v4 as uuidv4 } from 'uuid';
 
 const CONTROL_CHANNEL_LABEL = "CONTROL";

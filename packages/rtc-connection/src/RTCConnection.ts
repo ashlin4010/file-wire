@@ -1,5 +1,6 @@
 import { Duplex} from "./Duplex";
-const WebRTC = require("wrtc");
+// @ts-ignore
+import * as WebRTC from "wrtc";
 import * as EventEmitter from "events";
 
 const RTCPeerConnection: RTCPeerConnection = WebRTC.RTCPeerConnection;
