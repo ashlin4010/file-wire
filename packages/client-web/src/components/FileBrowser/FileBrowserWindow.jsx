@@ -7,8 +7,6 @@ import FileBrowserAddressBar from "./FileBrowserAddressBar";
 import useFileSelection from "../../hooks/useFileSelection";
 import useBrowserArguments from "../../hooks/useBrowserArguments";
 
-//import streamSaver from 'streamsaver';
-
 
 export default function FileBrowser(props) {
     const {
@@ -19,7 +17,11 @@ export default function FileBrowser(props) {
         onPathChange,
         onLocationNext,
         onLocationPrevious,
-        onLocationUp
+        onLocationUp,
+        onContextMenu,
+        contextMenu,
+        setContextMenu,
+        contextMenuItems,
     } = props;
 
     const history = useHistory();
@@ -38,65 +40,17 @@ export default function FileBrowser(props) {
     }
 
     const handleOpen = ({file, directory, event}) => {
-        console.log("open", file.name, file.type);
-        if(file.isDirectory) changePath(file.path.full, true);
-        else {
-
-            onOpen({file, directory, event});
-            // controller.createRequestResponseChannel("testing").on("open", (channel => {
-            //     console.log("channel open", channel);
-            //
-            //     // controller.getFileStats(file.path.full)
-            //     //     .then(({data}) => {
-            //     //         console.log(data);
-            //     //     })
-            //     //     .catch(({message}) => {
-            //     //         console.error(message);
-            //     //     });
-            //
-            //
-            //     (async () => {
-            //         let chunkSize = 16384;
-            //         let fileSize = file.size;
-            //
-            //         const fileStream = streamSaver.createWriteStream(file.name, {size: file.size});
-            //         const writer = fileStream.getWriter();
-            //
-            //         let bytes = 0;
-            //
-            //         for(let i = 0; i < (fileSize / chunkSize >> 0); i++) {
-            //             let offset = i * chunkSize;
-            //             let length = chunkSize;
-            //
-            //             let {data} = await controller.readFile(file.path.full, {offset, length});
-            //             let array = new Uint8Array(data.data);
-            //             await writer.write(array);
-            //             bytes += array.byteLength;
-            //             //console.log(((offset/file.size)*100).toFixed(0));
-            //
-            //             console.log(bytes, fileSize);
-            //         }
-            //
-            //         console.log("end has come")
-            //
-            //         let lastChunkOffset = (fileSize / chunkSize >> 0) * chunkSize;
-            //         let lastChunkOffsetLength = fileSize % chunkSize;
-            //
-            //         console.log(lastChunkOffset, lastChunkOffsetLength);
-            //
-            //         let {data} = await controller.readFile(file.path.full, {offset: lastChunkOffset, length:lastChunkOffsetLength});
-            //         let array = new Uint8Array(data.data);
-            //
-            //         await writer.write(array);
-            //         bytes += array.byteLength;
-            //
-            //         console.log(bytes, fileSize);
-            //
-            //         await writer.close();
-            //     })();
-            // }));
-        }
+        onOpen({file, directory, event});
     }
+
+    const handleClose = (e) => {
+        if(e) e.preventDefault();
+        setContextMenu(null);
+    };
+
+    const handleContextMenu = ({file, directory, event}) => {
+        onContextMenu({selected: getSelected(), file, directory, event});
+    };
 
     useEffect(() => {
         if (controller === null) return history.push(createReConnectLink());
@@ -109,24 +63,6 @@ export default function FileBrowser(props) {
         });
     },[]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const [contextMenu, setContextMenu] = React.useState(null);
-
-    const handleClose = (e) => {
-        if(e) e.preventDefault();
-        setContextMenu(null);
-    };
-
-    const handleContextMenu = ({event}) => {
-        if(!event.ctrlKey) event.preventDefault();
-        setContextMenu(
-            contextMenu === null
-                ? {
-                    mouseX: event.clientX - 2,
-                    mouseY: event.clientY - 4,
-                }
-                : null,
-        );
-    };
 
     return (<div onContextMenu={handleClose}>
             <Menu
@@ -140,10 +76,7 @@ export default function FileBrowser(props) {
                         : undefined
                 }
             >
-                <MenuItem onClick={handleClose}>Copy {getSelected().length}</MenuItem>
-                <MenuItem onClick={handleClose}>Print</MenuItem>
-                <MenuItem onClick={handleClose}>Highlight</MenuItem>
-                <MenuItem onClick={handleClose}>Email</MenuItem>
+                { contextMenuItems }
             </Menu>
             <Box
                 sx={{

@@ -16,7 +16,7 @@ export declare interface ReqResChannel {
     on(event: 'open', listener: (channel: ReqResChannel) => void): this;
 }
 
-export class ReqResChannel extends EventEmitter{
+export class ReqResChannel extends EventEmitter {
     channel: RTCDataChannel;
     id: number | null;
     label: string;

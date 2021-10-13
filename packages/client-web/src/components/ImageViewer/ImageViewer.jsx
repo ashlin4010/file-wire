@@ -45,16 +45,14 @@ export default function ImageViewer(props) {
         })();
     },[file, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    return (
-        <div style={{textAlign: "center", paddingTop: 50}}>
+    return (<div style={{textAlign: "center", paddingTop: 50}}>
             {file && file.name}
             <br/>
             {imageUrl === null && <CircularProgress style={{marginTop: 50}}/> }
             <img alt={file && file.name}
-                style={{maxWidth: "60vw", marginLeft: "auto", marginRight: "auto", display: "block"}}
+                style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}}
                 src={imageUrl !== null ? imageUrl : undefined}
             onLoad={() => URL.revokeObjectURL(imageUrl)}/>
-        </div>
-    );
+        </div>);
 
 }

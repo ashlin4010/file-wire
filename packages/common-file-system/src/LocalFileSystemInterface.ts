@@ -46,10 +46,10 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         });
     }
 
-    createReadStream(path: string): stream.Readable {
+    createReadStream(path: string, options?: {highWaterMark: number, start: number, end: number}): stream.Readable {
         let relativePath = this.safePath(path);
         let absolutePath = this.absolutePath(relativePath);
-        return fs.createReadStream(absolutePath);
+        return fs.createReadStream(absolutePath, options);
     }
 
     createWriteStream(path: string): stream.Writable {

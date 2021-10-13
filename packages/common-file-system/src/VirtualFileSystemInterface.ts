@@ -33,7 +33,7 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
         });
     }
 
-    createReadStream(path: string): stream.Readable {
+    createReadStream(path: string, options?: {highWaterMark: number, start: number, end: number}): stream.Readable {
         path = Path.normalize(path);
         let fileObject: unknown = this.resolvePath(path, this.fss);
         if(this.isFile(fileObject)) return toNodeReadable((fileObject as File).stream());

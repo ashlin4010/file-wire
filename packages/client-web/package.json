@@ -21,6 +21,7 @@
     "@types/react-router-dom": "^5.3.1",
     "common-file-system": "^0.3.0",
     "js-base64": "^3.7.2",
+    "node-web-streams": "^0.2.2",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

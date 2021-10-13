@@ -20,7 +20,7 @@ export interface ReadWriteFileSystemInterface extends ReadOnlyFileSystemInterfac
 export interface ReadOnlyFileSystemInterface {
     readdir(path: string): Promise<string[]>;
     stat(path: string): Promise<Stats>;
-    createReadStream(path: string): stream.Readable;
+    createReadStream(path: string, options?: {highWaterMark: number, start: number, end: number}): stream.Readable;
 
     read(path: string, options: {offset?: number, length?: number}, callback?: (err: Error | null, buffer?: ArrayBuffer) => void): void;
     read(path: string, options: any, callback?: (err: Error | null, buffer?: ArrayBuffer) => void): void;
