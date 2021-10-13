@@ -1,6 +1,6 @@
 {
   "name": "file-wire-server",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "FileWire.IO Server",
   "author": "ashlin4010",
   "license": "MIT",
@@ -19,10 +19,10 @@
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "common-file-system": "^0.4.0",
+    "common-file-system": "^0.4.1",
     "express": "^4.17.1",
-    "rtc-connection": "^0.4.0",
-    "rtc-controller": "^0.4.0",
-    "ws-domain": "^0.4.0"
+    "rtc-connection": "^0.4.1",
+    "rtc-controller": "^0.4.1",
+    "ws-domain": "^0.4.1"
   }
 }
