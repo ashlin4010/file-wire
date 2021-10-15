@@ -26,7 +26,7 @@ export default function useBrowserArguments () {
     const prevPath = safeDecode(usePrevious(base64Path));
     const route = window.location.pathname.split("/")[1];
     const createReConnectLink = (autoConnect=true) => {
-        const autoConnectURL = new URL(window.location.host);
+        const autoConnectURL = new URL(window.location.origin);
         autoConnectURL.searchParams.append("d", domainAddress);
         if(route) autoConnectURL.searchParams.append("r", route);
         if(base64Path) autoConnectURL.searchParams.append("p", base64Path);
