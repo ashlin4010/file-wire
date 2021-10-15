@@ -15,6 +15,7 @@ import ImageViewer from "./ImageViewer/ImageViewer";
 import "./App.css";
 
 const isProduction = process.env.NODE_ENV === "production";
+// const isProduction = true;
 
 function createDomainConnection(url, domain) {
     return new Promise((resolve, reject) => {
@@ -76,15 +77,15 @@ export default function App() {
     const [domain, setDomain] = useState(defaultDomain);
     const navHistory = useNavigationHistory();
 
-    const handleConnectClick = (domainAddress, openError, completeConnect) => {
+    const handleConnectClick = (domain,openError, completeConnect) => {
         let link = isProduction ? window.location.origin.replace("http", "ws") : "ws://localhost:8080";
-        tryConnect(link, domainAddress, true, false)
+        // let link = "ws://localhost:8080";
+        tryConnect(link, domain, true, false)
             .then(controller => {
                 controller.on("disconnect", () => {
                     setController(null);
                 });
                 setController(controller);
-                setDomain(domainAddress);
                 completeConnect();
             })
             .catch(() => {
@@ -92,13 +93,11 @@ export default function App() {
             });
     }
 
-
     return (
         <Router history={history}>
             <NavBar/>
             <Switch>
                 <Route path="/domain/:domainAddress/:base64Path?">
-
                     <FileBrowser
                         controller={controller}
                         domain={domain}
@@ -114,12 +113,11 @@ export default function App() {
                         fileStore={fileStore}
                     />
                 </Route>
-
                 <Route path="/*">
                     <DomainConnectMenu
                         RTCController={controller}
-                        defaultValue={domain}
                         domain={domain}
+                        setDomain={setDomain}
                         onConnect={handleConnectClick}
                     />
                 </Route>

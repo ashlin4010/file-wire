@@ -38,21 +38,25 @@ function useQuery() {
 }
 
 export default function DomainConnectMenu(props) {
-    let {defaultValue, onConnect, RTCController, domain} = props;
+    let {onConnect, RTCController, domain, setDomain} = props;
+
     let {a: autoConnect, p:path, d: queryDomain, r: route} = useQuery();
-    defaultValue = queryDomain ? queryDomain : defaultValue;
+    domain = queryDomain ? queryDomain : domain;
     path = path ? path : "Lw==";
     route = route ? route : "domain";
-    const [currentDomainInput, setCurrentDomainInput] = useState(defaultValue);
+
     const [loading, setLoading] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
     const history = useHistory();
     const isConnected = RTCController !== null;
+    const [currentDomainInput, setCurrentDomainInput] = useState(domain);
+
 
     // http://localhost:3000/?a=true&p=Lw%3D%3D&domain=testing
 
     const handleChange = (event) => {
         setCurrentDomainInput(event.target.value);
+        setDomain(event.target.value);
     }
 
     const completeConnect = () => {
@@ -65,7 +69,7 @@ export default function DomainConnectMenu(props) {
         } else {
             setLoading(true);
             setErrorOpen(false);
-            if (onConnect) onConnect(currentDomainInput, openError, completeConnect);
+            if (onConnect) onConnect(domain, openError, completeConnect);
         }
     }
 
@@ -110,14 +114,14 @@ export default function DomainConnectMenu(props) {
                         size={"small"}
                         color="primary"
                         label="Domain"
+                        defaultValue={currentDomainInput}
                         variant="outlined"
-                        defaultValue={defaultValue}
                         placeholder={"#Domain"}
                         disabled={isConnected}
                     />
                     <CssLoadingButton
                         onClick={beginConnect}
-                        disabled={currentDomainInput.length < 4}
+                        disabled={domain.length < 4}
                         loading={loading}
                         variant="contained">
                         {isConnected ? "Resume" : "Connect"}
