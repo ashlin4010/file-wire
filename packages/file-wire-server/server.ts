@@ -1,6 +1,7 @@
 import { WebSocketDomainServer } from "ws-domain";
 import * as express from "express";
 import * as http from "http";
+import * as path from "path";
 import { URL } from "url";
 const app = express();
 const server = http.createServer(app);
@@ -11,8 +12,12 @@ const isProduction = process.env.NODE_ENV === "production";
 
 app.use(express.static("public"));
 
-app.get("/*", (req,res) => {
-    res.redirect("/");
+// app.get("/*", (req,res) => {
+//     res.redirect("/");
+// });
+
+app.get(['/', '/*'], function(req, res, next) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 server.on('upgrade', function upgrade(request, socket, head) {

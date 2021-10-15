@@ -9,6 +9,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node ./dest/index.js",
+    "start-live": "export SERVER_ADR=filewire.io && export NODE_ENV=production && node ./dest/index.js",
     "watch": "tsnd --respawn index.ts"
   },
   "devDependencies": {

@@ -70,13 +70,14 @@ function tryConnect(url, domainAddress, isInitiator, isServer) {
 
 
 export default function App() {
+    const defaultDomain = isProduction ? "" : "testing";
     const [controller, setController] = useState(null);
     const [fileStore, setFileStore] = useState({});
-    const [domain, setDomain] = useState("testing");
+    const [domain, setDomain] = useState(defaultDomain);
     const navHistory = useNavigationHistory();
 
     const handleConnectClick = (domainAddress, openError, completeConnect) => {
-        let link = isProduction ? window.location.href.replace("http", "ws") : "ws://localhost:8080";
+        let link = isProduction ? window.location.origin.replace("http", "ws") : "ws://localhost:8080";
         tryConnect(link, domainAddress, true, false)
             .then(controller => {
                 controller.on("disconnect", () => {

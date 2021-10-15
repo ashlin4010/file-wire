@@ -50,8 +50,6 @@ tryConnect().then(async (wsProxy) => {
         });
     }
 
-
-
 }).catch(() => {
     log("Failed to connect to signalling server, stopping");
     process.exit(0);
@@ -73,10 +71,16 @@ function tryConnect(maxRetries: number = 5): Promise<any>  {
                 log("Websocket connection failed to be established, the target might not be online, retrying in 1 second");
                 if(attempt > maxRetries) reject("Websocket connection failed to be established");
             });
+
             domainConnection.on("connect", async (wsProxy) => {
                 clearInterval(retry);
                 resolve(wsProxy);
             });
+
+            domainConnection.on("disconnect", ((code, reason) => {
+                console.log("disconnect from domain,", code, reason);
+            }));
+
         }, 1000);
     });
 }

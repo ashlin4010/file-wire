@@ -8,3 +8,4 @@ packages/*/build
 packages/client-cli/testdata
 packages/demo/*/dest/
 .env
+packages/file-wire-server/public
