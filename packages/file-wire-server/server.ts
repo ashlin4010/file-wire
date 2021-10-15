@@ -9,6 +9,10 @@ const domainServer = new WebSocketDomainServer();
 
 app.use(express.static("public"));
 
+app.get("/*", (req,res) => {
+    res.redirect("/");
+});
+
 server.on('upgrade', function upgrade(request, socket, head) {
     const reqUrl = new URL(request.url || "localhost", 'http://' + request.headers.host);
     let token = reqUrl.searchParams.get("token");

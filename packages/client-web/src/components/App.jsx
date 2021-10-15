@@ -32,7 +32,18 @@ function createWebRTCConnection(ws, isInitiator, isServer) {
     return new Promise((resolve, reject) => {
         let wsDuplex = new WsDuplex(ws);
         let fs = new FileSystemInterface();
-        let rtc = new RTCConnection(wsDuplex, isInitiator , {});
+        let rtc = new RTCConnection(wsDuplex, isInitiator , {
+            'iceServers': [
+                {
+                  'urls:': 'stun:stun.filewire.io:3478'
+                },
+                {
+                    'urls': 'stun:stun.l.google.com:19302'
+                }
+            ]
+        });
+
+
         let controller = new RTCController(rtc, isServer, isInitiator, fs);
 
         controller.on("control", () => {
