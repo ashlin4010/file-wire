@@ -14,6 +14,7 @@ import FileBrowser from "./FileBrowser/FileBrowser";
 import ImageViewer from "./ImageViewer/ImageViewer";
 import "./App.css";
 
+const isProduction = process.env.NODE_ENV === "production";
 
 function createDomainConnection(url, domain) {
     return new Promise((resolve, reject) => {
@@ -35,14 +36,13 @@ function createWebRTCConnection(ws, isInitiator, isServer) {
         let rtc = new RTCConnection(wsDuplex, isInitiator , {
             'iceServers': [
                 {
-                  'urls:': 'stun:stun.filewire.io:3478'
+                    'urls': 'stun:stun.filewire.io:3478'
                 },
                 {
                     'urls': 'stun:stun.l.google.com:19302'
                 }
             ]
         });
-
 
         let controller = new RTCController(rtc, isServer, isInitiator, fs);
 
@@ -76,8 +76,7 @@ export default function App() {
     const navHistory = useNavigationHistory();
 
     const handleConnectClick = (domainAddress, openError, completeConnect) => {
-        let link = window.location.href.replace("http", "ws");
-        // "ws://localhost:8080"
+        let link = isProduction ? window.location.href.replace("http", "ws") : "ws://localhost:8080";
         tryConnect(link, domainAddress, true, false)
             .then(controller => {
                 controller.on("disconnect", () => {

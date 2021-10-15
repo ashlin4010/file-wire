@@ -2,8 +2,11 @@ import { DomainConnection } from "ws-domain";
 import { FileSystemInterface } from "common-file-system";
 import { RTCConnection, WsDuplex } from "rtc-connection";
 import { RTCController } from "rtc-controller";
-// let url = "ws://127.0.0.1:8080";
-let url = "wss://fileWire.io";
+
+const isProduction = process.env.NODE_ENV === "production";
+const serverAdr = process.env.SERVER_ADR;
+let url = isProduction ? `wss://${serverAdr}` : "ws://127.0.0.1:8080";
+
 let path = "./testdata"
 let isServer = true;
 let isInitiator = !isServer;
@@ -25,7 +28,7 @@ tryConnect().then(async (wsProxy) => {
             let rtc = new RTCConnection(wsDuplex, isInitiator, {
                 'iceServers': [
                     {
-                        'urls:': 'stun:stun.filewire.io:3478'
+                        'urls': `stun:stun.filewire.io:3478`
                     },
                     {
                         'urls': 'stun:stun.l.google.com:19302'
