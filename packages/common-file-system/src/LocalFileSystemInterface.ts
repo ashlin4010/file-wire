@@ -32,6 +32,8 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
                     if (err) reject(err);
                     else {
                         length = length || stats.size;
+                        // prevent over reading file
+                        if(offset + length > stats.size) length = stats.size - offset;
                         let b = Buffer.alloc(length ? length : stats.size);
                         fs.read(fd, b, 0, length, offset, (err, bytesRead, buffer) => {
                             if (err) reject(err);

@@ -55,8 +55,8 @@ export default function DomainConnectMenu(props) {
     // http://localhost:3000/?a=true&p=Lw%3D%3D&domain=testing
 
     const handleChange = (event) => {
-        setCurrentDomainInput(event.target.value);
         setDomain(event.target.value);
+        setCurrentDomainInput(event.target.value);
     }
 
     const completeConnect = () => {
@@ -88,6 +88,7 @@ export default function DomainConnectMenu(props) {
     }
 
     useEffect(() => {
+        setDomain(currentDomainInput);
         if(autoConnect === "true") beginConnect();
     },[]); // eslint-disable-line react-hooks/exhaustive-deps
 

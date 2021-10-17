@@ -9,3 +9,6 @@ packages/client-cli/testdata
 packages/demo/*/dest/
 .env
 packages/file-wire-server/public
+packages/demo/rtcController/mp4box.all.min.js
+packages/demo/rtcController/vpTesting.js
+packages/demo/rtcController/index.html

@@ -12,10 +12,11 @@ import NavBar from "./Header/NavBar";
 import DomainConnectMenu from "./DomainConnectMenu/DomainConnectMenu";
 import FileBrowser from "./FileBrowser/FileBrowser";
 import ImageViewer from "./ImageViewer/ImageViewer";
+import VideoPlayer from "./VideoPlayer/VideoPlayer";
 import "./App.css";
 
 const isProduction = process.env.NODE_ENV === "production";
-// const isProduction = true;
+//const isProduction = true;
 
 function createDomainConnection(url, domain) {
     return new Promise((resolve, reject) => {
@@ -113,6 +114,15 @@ export default function App() {
                         fileStore={fileStore}
                     />
                 </Route>
+
+                <Route path="/video/:domainAddress/:base64Path?">
+                    <VideoPlayer
+                        controller={controller}
+                        fileStore={fileStore}
+                    />
+                </Route>
+
+
                 <Route path="/*">
                     <DomainConnectMenu
                         RTCController={controller}

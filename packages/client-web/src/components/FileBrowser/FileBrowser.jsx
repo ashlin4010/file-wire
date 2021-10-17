@@ -103,6 +103,9 @@ export default function FileBrowser(props) {
     }
 
     const open = (file) => {
+
+        console.log(file.type);
+
         if(file.isDirectory) {
             handlePathChange(file.path.full,true, (success) => {
                 if(success) history.push(`/domain/${domain}/${encode(file.path.full)}`);
@@ -117,6 +120,9 @@ export default function FileBrowser(props) {
                 case "image/webp":
                 case "image/bmp":
                     history.push(`/image/${domain}/${encode(file.path.full)}`);
+                    break;
+                case "video/mp4":
+                    history.push(`/video/${domain}/${encode(file.path.full)}`);
                     break;
                 default: downLoad(file);
             }
