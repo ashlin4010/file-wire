@@ -5,7 +5,7 @@ COPY lerna.json ./
 COPY packages/*/package*.json ./packages/
 RUN npm install
 COPY . .
-RUN npx lerna bootstrap --hoist
+RUN npm run bootstrap
 RUN npm run build
 RUN npm run build-web-client
 RUN npm run build-server

@@ -153,6 +153,7 @@ export default function FileBrowser(props) {
     }
 
     const downLoad = (file) => {
+        // web-streams-polyfill in index.html
         controller.getFileStream(file.path.full).then(({code, data, message}) => {
             const fileStream = streamSaver.createWriteStream(file.name, {size: file.size,});
             const writer = fileStream.getWriter();

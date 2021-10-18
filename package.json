@@ -4,6 +4,7 @@
   "license": "MIT",
   "repository": "https://github.com/ashlin4010/file-wire.git",
   "scripts": {
+    "bootstrap": "npx lerna bootstrap --hoist",
     "build": "npx lerna run build --ignore '{demo,client-web,client-cli,file-wire-server}'",
     "build-demos": "npx lerna run build",
     "watch": "npx lerna run --parallel watch --scope '{file-wire-server,client-cli,client-web}'",
