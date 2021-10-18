@@ -162,7 +162,7 @@ export class RTCController extends EventEmitter {
         function fileStream(send: Function, command: ControlCommand, data?: { path: string, label: string }) {
             if (data?.path) {
                 console.log("downloading", data.path, data.label);
-                let rs = fs.createReadStream(data.path, {highWaterMark: 128 * 1024});
+                let rs = fs.createReadStream(data.path, {highWaterMark: 64 * 1024});
                 let stream = new StreamSenderChannel(rtc.createDataChannel(data.label), rs);
                 stream.start();
                 send({code: ControlStatusCodes.OK, data});
