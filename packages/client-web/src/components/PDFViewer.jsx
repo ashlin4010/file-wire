@@ -1,14 +1,15 @@
-import { useHistory } from "react-router-dom";
-import React, {useEffect, useState} from "react"
-import useBrowserArguments from "../../hooks/useBrowserArguments";
+import {useHistory} from "react-router-dom";
+import useBrowserArguments from "../hooks/useBrowserArguments";
+import React, {useEffect, useState} from "react";
 import {encode} from "js-base64";
-import ContentFrame from "../ContentFrame";
+import ContentFrame from "./ContentFrame";
 
-export default function ImageViewer(props) {
+export default function PDFViewer(props) {
+
     const {controller, fileStore} = props;
     const history = useHistory();
     const {path, createReConnectLink, domainAddress} = useBrowserArguments();
-    const [imageUrl, setImageURL] = useState(null);
+    const [pdf, setPdf] = useState(null);
     const [file, setFile] = useState(null);
 
     const returnToBrowser = () => {
@@ -23,10 +24,11 @@ export default function ImageViewer(props) {
         })();
     },[path, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
+
     useEffect(() => {
         (async() => {
             if(file === null) return;
-            setImageURL(null);
+            setPdf(null);
             let chunkSize = 16000;
             let fileSize = file.size;
             let lastChunkOffset = (fileSize / chunkSize >> 0) * chunkSize;
@@ -43,19 +45,18 @@ export default function ImageViewer(props) {
             let {data} = await controller?.readFile(file.path.full, {offset: lastChunkOffset, length:lastChunkOffsetLength});
             fileDataChunks.push(new Uint8Array(data.data, 0, chunkSize));
 
-            let blob = new Blob(fileDataChunks);
+            let blob = new Blob(fileDataChunks, {type: 'application/pdf'});
             const objectURL = URL.createObjectURL(blob);
-            setImageURL(objectURL);
+            setPdf(objectURL);
+            //window.open(objectURL);
         })();
     },[file, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
+
     return (
-    <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={imageUrl === null}>
-        <img alt={file && file.name}
-             style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}}
-             src={imageUrl !== null ? imageUrl : undefined}
-             onLoad={() => URL.revokeObjectURL(imageUrl)}/>
-    </ContentFrame>);
+        <ContentFrame style={{width: "90%", padding: 0, height: "80vh"}} name={file && file.name} onBack={returnToBrowser} loading={pdf === null}>
+            <iframe style={{border: "none", width: "100%", height: "80vh"}} src={pdf}/>
+        </ContentFrame>);
 
 }

@@ -1,15 +1,17 @@
-import { useHistory } from "react-router-dom";
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react";
+import {useHistory} from "react-router-dom";
 import useBrowserArguments from "../../hooks/useBrowserArguments";
 import {encode} from "js-base64";
 import ContentFrame from "../ContentFrame";
+import {Paper} from "@mui/material";
 
-export default function ImageViewer(props) {
+export default function TextViewer(props) {
     const {controller, fileStore} = props;
     const history = useHistory();
     const {path, createReConnectLink, domainAddress} = useBrowserArguments();
-    const [imageUrl, setImageURL] = useState(null);
     const [file, setFile] = useState(null);
+    const [text, setText] = useState("");
+
 
     const returnToBrowser = () => {
         history.push(`/domain/${domainAddress}/${encode(file.path.dir)}`);
@@ -26,36 +28,23 @@ export default function ImageViewer(props) {
     useEffect(() => {
         (async() => {
             if(file === null) return;
-            setImageURL(null);
+            setText("");
             let chunkSize = 16000;
             let fileSize = file.size;
             let lastChunkOffset = (fileSize / chunkSize >> 0) * chunkSize;
             let lastChunkOffsetLength = fileSize % chunkSize;
-            let fileDataChunks = [];
-
-            for(let i = 0; i < (fileSize / chunkSize >> 0); i++) {
-                let offset = i * chunkSize;
-                let length = chunkSize
-                let {data} = await controller?.readFile(file.path.full, {offset, length});
-                fileDataChunks.push(new Uint8Array(data.data, 0, chunkSize));
-            }
-
             let {data} = await controller?.readFile(file.path.full, {offset: lastChunkOffset, length:lastChunkOffsetLength});
-            fileDataChunks.push(new Uint8Array(data.data, 0, chunkSize));
+            let utf8decoder = new TextDecoder();
+            setText(utf8decoder.decode(new Uint8Array(data.data, 0, chunkSize)))
 
-            let blob = new Blob(fileDataChunks);
-            const objectURL = URL.createObjectURL(blob);
-            setImageURL(objectURL);
         })();
     },[file, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
     return (
-    <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={imageUrl === null}>
-        <img alt={file && file.name}
-             style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}}
-             src={imageUrl !== null ? imageUrl : undefined}
-             onLoad={() => URL.revokeObjectURL(imageUrl)}/>
-    </ContentFrame>);
+        <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={!text}>
+            <Paper style={{width: "60vw", height: "60vh",textAlign: "start", padding: 10}}>
+                <p>{!!text && text}</p>
+            </Paper>
+        </ContentFrame>);
 
 }

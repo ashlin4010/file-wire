@@ -13,6 +13,8 @@ import DomainConnectMenu from "./DomainConnectMenu/DomainConnectMenu";
 import FileBrowser from "./FileBrowser/FileBrowser";
 import ImageViewer from "./ImageViewer/ImageViewer";
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
+import TextViewer from "./TextViewer/TextViewer";
+import PDFViewer from "./PDFViewer";
 import "./App.css";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -78,9 +80,8 @@ export default function App() {
     const [domain, setDomain] = useState(defaultDomain);
     const navHistory = useNavigationHistory();
 
-    const handleConnectClick = (domain,openError, completeConnect) => {
+    const handleConnectClick = (domain, openError, completeConnect) => {
         let link = isProduction ? window.location.origin.replace("http", "ws") : "ws://localhost:8080";
-        // let link = "ws://localhost:8080";
         tryConnect(link, domain, true, false)
             .then(controller => {
                 controller.on("disconnect", () => {
@@ -117,6 +118,20 @@ export default function App() {
 
                 <Route path="/video/:domainAddress/:base64Path?">
                     <VideoPlayer
+                        controller={controller}
+                        fileStore={fileStore}
+                    />
+                </Route>
+
+                <Route path="/text/:domainAddress/:base64Path?">
+                    <TextViewer
+                        controller={controller}
+                        fileStore={fileStore}
+                    />
+                </Route>
+
+                <Route path="/pdf/:domainAddress/:base64Path?">
+                    <PDFViewer
                         controller={controller}
                         fileStore={fileStore}
                     />

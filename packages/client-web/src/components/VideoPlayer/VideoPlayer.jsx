@@ -1,17 +1,18 @@
-/* eslint-disable */
-
 import { useHistory } from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react"
 import CircularProgress from '@mui/material/CircularProgress';
 import useBrowserArguments from "../../hooks/useBrowserArguments";
+import ContentFrame from "../ContentFrame";
+import {encode} from "js-base64";
 let MP4Box = require('./mp4box.all.min');
+// import * as MP4Box from "mp4box";
 
 
 const VideoElement = React.forwardRef((props, ref) => {
     return <video style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}} controls ref={ref}/>
 });
 
-const SAMPLE_SIZE = 10;
+const SAMPLE_SIZE = 100;
 
 class FileStream {
 
@@ -65,15 +66,12 @@ class FileStream {
                 console.log("reading data...");
                 if(this.sleepTime) await this.sleep(this.sleepTime);
                 let totalFileSize = this.file.size;
-
-                console.log("file size:", this.file.size, "offset:", this.offset, "length:", this.chunkSize, "file:", this.file.path.full);
-                // let {data, totalFileSize} = await this.reader.getByteRange(this.offset, this.chunkSize + this.offset);
+                //console.log("file size:", this.file.size, "offset:", this.offset, "length:", this.chunkSize);
                 let {data, code, message} = await this.controller.readFile(this.file.path.full, {offset: this.offset, length: this.chunkSize});
-
                 let value = new Uint8Array(data.data, 0, this.chunkSize);
-                if(value && (this.offset + value.byteLength >= totalFileSize)) done = true;
 
 
+                if(value && (this.offset + value.byteLength > totalFileSize)) done = true;
                 if(this.ondata) this.ondata({ done, value });
                 if(done) this.isRunning = false;
                 else this.offset += value.byteLength;
@@ -86,10 +84,14 @@ class FileStream {
 export default function VideoPlayer(props) {
     const {controller, fileStore} = props;
     const history = useHistory();
-    const {path, createReConnectLink} = useBrowserArguments();
+    const {path, createReConnectLink, domainAddress} = useBrowserArguments();
     const [file, setFile] = useState(null);
 
     const videoElementRef = useRef(null);
+
+    const returnToBrowser = () => {
+        history.push(`/domain/${domainAddress}/${encode(file.path.dir)}`);
+    }
 
     useEffect(() => {
         (async () => {
@@ -99,29 +101,30 @@ export default function VideoPlayer(props) {
         })();
     },[path, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
     useEffect(() => {
+        const video = videoElementRef.current;
+        const mediaSource = new MediaSource();
+        let mp4boxFile = null;
+        let fileStream = null;
+        let hasLoaded = false;
+
         (async() => {
             if(file === null) return;
-            const video = videoElementRef.current;
-            const mediaSource = new MediaSource();
-            let mp4boxFile = null;
-            let fileStream = null;
-
-            mediaSource.onsourceclose = (e) => {
-                console.log(e);
-            }
 
             mediaSource.video = video;
             video.ms = mediaSource;
             video.src = window.URL.createObjectURL(mediaSource)
 
             video.addEventListener("play", (event) => {
-                event.target.play(event);
-                load();
+                if(!hasLoaded) {
+                    hasLoaded = true;
+                    event.target.play();
+                    load();
+                }
             });
 
             function load() {
+                let hadFirstSeg = false;
                 if (video.ms.readyState !== "open") return;
 
                 mp4boxFile = MP4Box.createFile();
@@ -131,14 +134,21 @@ export default function VideoPlayer(props) {
                     let buffer = value.buffer;
                     buffer.fileStart = fileStream.offset;
 
-                    console.log(buffer.fileStart)
-                    console.log(buffer);
+                    let expectedNext = mp4boxFile.appendBuffer(buffer, true);
 
-                    let expectedNext = mp4boxFile.appendBuffer(buffer, done);
+                    console.log("read end:", fileStream.offset + buffer.byteLength, "Next read:", expectedNext, "file size:", file.size, done);
+
+                    if(expectedNext === undefined || expectedNext >= file.size) {
+                        console.log("stop");
+                        done = true;
+                        fileStream.stop();
+                        //mp4boxFile.flush();
+                    }
+
                     if(done) mp4boxFile.flush();
                     else fileStream.setOffset(expectedNext);
-                };
 
+                };
 
                 mp4boxFile.onReady = function (info) {
                     console.log(info);
@@ -159,14 +169,14 @@ export default function VideoPlayer(props) {
             }
 
             function onInitAppended(e) {
-                var sb = e.target; // source buffer
+                let sb = e.target; // source buffer
                 if (sb.ms.readyState === "open") {
                     sb.sampleNum = 0; //idk
                     sb.removeEventListener('updateend', onInitAppended); // dont loop this event
                     sb.addEventListener('updateend', onUpdateEnd.bind(sb, true, true)); // do this instead
 
                     /* In case there are already pending buffers we call onUpdateEnd to start appending them*/
-                    onUpdateEnd.call(sb, false, true);
+                    //onUpdateEnd.call(sb, false, true);
                     sb.ms.pendingInits--;
 
                     if (sb.ms.pendingInits === 0) {
@@ -189,18 +199,23 @@ export default function VideoPlayer(props) {
                         mp4boxFile.releaseUsedSamples(this.id, this.sampleNum);
                         delete this.sampleNum; // why do this?
                     }
-                    if (this.is_last) {
-                        //this.ms.endOfStream();
+                    if (this.is_last && this.ms.readyState === "open" && !this.ms.updating) {
+                        let areNotUpdating = [...Array(this.ms.sourceBuffers.length).keys()].map(i => {
+                            let sourceBuffer = mediaSource.sourceBuffers[i];
+                            return !sourceBuffer.updating;
+                        });
+
+                        if (areNotUpdating.every(Boolean)) this.ms.endOfStream();
                     }
                 }
 
-
-                if (this.ms.readyState === "open" && this.updating === false && this.pendingAppends.length > 0) {
-                    var obj = this.pendingAppends.shift();
+                if (this.ms.readyState === "open" && this.pendingAppends.length > 0 && !this.updating) {
+                    let obj = this.pendingAppends.shift();
                     this.sampleNum = obj.sampleNum;
                     this.is_last = obj.is_last;
                     this.appendBuffer(obj.buffer);
                 }
+
             }
 
             function addBuffer(video, mp4track) {
@@ -243,11 +258,36 @@ export default function VideoPlayer(props) {
             }
 
         })();
+
+        return () => {
+            fileStream?.stop();
+            video?.pause();
+            video?.removeAttribute('src'); // empty source
+            video?.load();
+            URL.revokeObjectURL(video?.src);
+
+            if(mp4boxFile) mp4boxFile.onSegment = undefined;
+            if(mp4boxFile) mp4boxFile.onReady = undefined;
+            mp4boxFile?.flush();
+
+            [...Array(mediaSource.sourceBuffers.length).keys()].forEach(i => {
+                let sourceBuffer = mediaSource.sourceBuffers[i];
+                sourceBuffer.abort();
+                mediaSource.removeSourceBuffer(sourceBuffer);
+            });
+        }
+
     }, [file, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
+
+
     return (
-    <div style={{paddingTop: "10vh"}}>
-        {/*<video id="video" controls/>*/}
-        <VideoElement ref={videoElementRef}/>
-    </div>);
+        <ContentFrame name={file && file.name} onBack={returnToBrowser}>
+            <VideoElement ref={videoElementRef}/>
+        </ContentFrame>);
+
+    // return (
+    // <div style={{paddingTop: "10vh"}}>
+    //     <VideoElement ref={videoElementRef}/>
+    // </div>);
 }

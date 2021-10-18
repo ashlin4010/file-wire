@@ -78,11 +78,13 @@ export default function FileBrowser(props) {
             >
                 { contextMenuItems }
             </Menu>
+
             <Box
                 sx={{
+                    marginTop: 4,
                     marginLeft: "auto",
                     marginRight: "auto",
-                    maxWidth: "80%",
+                    maxWidth: "60%",
                     '& > :not(style)': {
                         m: 1,
                         color: "#ffffff",

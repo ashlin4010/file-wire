@@ -53,26 +53,32 @@ function FileNode(props) {
     const {file, onSelect, onContextMenu} = props
     const {name, selected, isDirectory, type: mineType} = file;
 
-    function getIcon(mineType) {
-        if (isDirectory) return faFolder;
+    function getIconAndColor(mineType) {
+        let fileIcon;
+        let color = "#ffffff";
+        if (isDirectory) return [faFolder, color];
         let mimeType = mineType || "application/octet-stream";
         let type = mimeType.split("/")[0];
         let format = mimeType.split("/")[1];
-        let fileIcon;
+
         if (type === "application" || type === "text") {
             switch (format) {
                 case "plain":
                     fileIcon = faFileAlt;
+                    color = "#78909C"
                     break;
                 case "pdf":
                     fileIcon = faFilePdf;
+                    color = "#C0392B";
                     break;
                 case "javascript":
                 case "html":
                     fileIcon = faFileCode
+                    color = "#3498DB"
                     break;
                 case "zip":
                     fileIcon = faFileArchive
+                    color = "#F1C40F"
                     break;
                 default:
                     fileIcon = faFile
@@ -82,19 +88,22 @@ function FileNode(props) {
             switch (type) {
                 case "video":
                     fileIcon = faFileVideo
+                    color = "#3498DB"
                     break;
                 case "image":
                     fileIcon = faFileImage
+                    color = "#16A085"
                     break;
                 case "audio":
                     fileIcon = faFileAudio
+                    color = "#9B59B6"
                     break;
                 default:
                     fileIcon = faFile
                     break;
             }
         }
-        return fileIcon;
+        return [fileIcon, color];
     }
 
     function handleClick(event) {
@@ -111,7 +120,7 @@ function FileNode(props) {
         <Grid item className={"file-node"} >
             <div onClick={handleClick} onContextMenu={handleContextMenu}>
                 <div className={"file-icon"}>
-                    <FontAwesomeIcon className={selected ? "selected-icon" : ""} icon={getIcon(mineType)}/>
+                    <FontAwesomeIcon style={{color: getIconAndColor(mineType)[1]}} className={selected ? "selected-icon" : ""} icon={getIconAndColor(mineType)[0]}/>
                 </div>
                 <p className={selected ? "selected-text" : ""}>{name}</p>
             </div>

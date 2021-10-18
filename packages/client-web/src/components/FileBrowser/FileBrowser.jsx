@@ -124,6 +124,12 @@ export default function FileBrowser(props) {
                 case "video/mp4":
                     history.push(`/video/${domain}/${encode(file.path.full)}`);
                     break;
+                case "text/plain":
+                    history.push(`/text/${domain}/${encode(file.path.full)}`);
+                    break;
+                case "application/pdf":
+                    history.push(`/pdf/${domain}/${encode(file.path.full)}`);
+                    break;
                 default: downLoad(file);
             }
         }
@@ -139,6 +145,9 @@ export default function FileBrowser(props) {
             case "image/tiff":
             case "image/webp":
             case "image/bmp": return true;
+            case "video/mp4": return true;
+            case "text/plain": return true;
+            case "application/pdf": return true;
             default: return false
         }
     }

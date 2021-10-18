@@ -80,7 +80,7 @@ export default function ShareDialogue(props) {
 
                 <FormGroup>
                     <FormControlLabel control={<Switch onChange={(e) => setAutoConnect(e.target.checked)} checked={autoConnect} />} label="Auto Connect" />
-                    <FormControlLabel control={<Switch onChange={(e) => setCurrentPath(e.target.checked)} checked={currentPath} />} label="Use Current Path" />
+                    <FormControlLabel disabled={route !== "domain"} control={<Switch onChange={(e) => setCurrentPath(e.target.checked)} checked={currentPath} />} label="Use Current Path" />
                     <TextField
                         fullWidth
                         multiline
