@@ -8,8 +8,9 @@
   "types": "dest/index.d.ts",
   "scripts": {
     "build": "npx tsc",
-    "start": "node ./dest/index.js",
-    "start-live": "export SERVER_ADR=filewire.io && export NODE_ENV=production && node ./dest/index.js",
+    "pack": "npm run build & pkg --targets node14-linux-x64,node14-win-x64 ./dest/index.js --output ./dest/build/FileWire",
+    "start-live": "cross-env SERVER_ADR=filewire.io NODE_ENV=production node ./dest/index.js",
+    "start": "cross-env SERVER_ADR=127.0.0.1:8080 NODE_ENV=development node ./dest/index.js",
     "watch": "tsnd --respawn index.ts"
   },
   "devDependencies": {
