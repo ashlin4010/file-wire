@@ -39,11 +39,11 @@ export default function PDFViewer(props) {
                 let offset = i * chunkSize;
                 let length = chunkSize
                 let {data} = await controller?.readFile(file.path.full, {offset, length});
-                fileDataChunks.push(new Uint8Array(data.data, 0, chunkSize));
+                fileDataChunks.push(new Uint8Array(Object.values(data), 0, chunkSize));
             }
 
             let {data} = await controller?.readFile(file.path.full, {offset: lastChunkOffset, length:lastChunkOffsetLength});
-            fileDataChunks.push(new Uint8Array(data.data, 0, chunkSize));
+            fileDataChunks.push(new Uint8Array(Object.values(data), 0, chunkSize));
 
             let blob = new Blob(fileDataChunks, {type: 'application/pdf'});
             const objectURL = URL.createObjectURL(blob);
@@ -56,7 +56,7 @@ export default function PDFViewer(props) {
 
     return (
         <ContentFrame style={{width: "90%", padding: 0, height: "80vh"}} name={file && file.name} onBack={returnToBrowser} loading={pdf === null}>
-            <iframe style={{border: "none", width: "100%", height: "80vh"}} src={pdf}/>
+            <iframe title={file && file.name} style={{border: "none", width: "100%", height: "80vh"}} src={pdf}/>
         </ContentFrame>);
 
 }

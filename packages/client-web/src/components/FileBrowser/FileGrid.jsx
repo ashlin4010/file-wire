@@ -1,9 +1,19 @@
 import React from "react";
-import {Grid} from "@mui/material";
+import {Grid,} from "@mui/material";
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
 import "./FileGrid.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode, faFileDownload} from "@fortawesome/free-solid-svg-icons";
 import {faFileAudio} from "@fortawesome/free-solid-svg-icons/faFileAudio";
+
+const NoMaxWidthTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))({
+    [`& .${tooltipClasses.tooltip}`]: {
+        maxWidth: 'none',
+    },
+});
 
 export default function FileGrid(props) {
     const {
@@ -53,6 +63,7 @@ export default function FileGrid(props) {
 function FileNode(props) {
     const {file, onSelect, onContextMenu} = props
     const {name, selected, isDirectory, type: mineType} = file;
+    const shortName = name.substring(0, 20);
 
     function getIconAndColor(mineType) {
         let fileIcon;
@@ -122,13 +133,21 @@ function FileNode(props) {
     }
 
     return (
-        <Grid item className={"file-node"} >
-            <div onClick={handleClick} onContextMenu={handleContextMenu}>
+        <NoMaxWidthTooltip title={name} placement="top"  enterDelay={500}>
+        <Grid item className={"file-node"}>
+            <div
+                onClick={handleClick}
+                onContextMenu={handleContextMenu}
+            >
                 <div className={"file-icon"}>
-                    <FontAwesomeIcon style={{color: getIconAndColor(mineType)[1]}} className={selected ? "selected-icon" : ""} icon={getIconAndColor(mineType)[0]}/>
+                    <FontAwesomeIcon
+                        style={{color: getIconAndColor(mineType)[1]}}
+                        className={selected ? "selected-icon" : ""}
+                        icon={getIconAndColor(mineType)[0]}/>
                 </div>
-                <p className={selected ? "selected-text" : ""}>{name}</p>
+                <p style={{margin: 0}} className={selected ? "selected-text" : ""}>{shortName}</p>
             </div>
         </Grid>
+        </NoMaxWidthTooltip>
     );
 }

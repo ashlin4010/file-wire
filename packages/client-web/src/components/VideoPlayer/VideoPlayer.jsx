@@ -1,12 +1,9 @@
 import { useHistory } from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react"
-import CircularProgress from '@mui/material/CircularProgress';
 import useBrowserArguments from "../../hooks/useBrowserArguments";
 import ContentFrame from "../ContentFrame";
 import {encode} from "js-base64";
 let MP4Box = require('./mp4box.all.min');
-// import * as MP4Box from "mp4box";
-
 
 const VideoElement = React.forwardRef((props, ref) => {
     return <video style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}} controls ref={ref}/>
@@ -67,7 +64,7 @@ class FileStream {
 
                 if(this.sleepTime) await this.sleep(this.sleepTime);
                 let totalFileSize = this.file.size;
-                let {data, code} = await this.controller.readFile(this.file.path.full, {offset: this.offset, length: this.chunkSize});
+                let {data} = await this.controller.readFile(this.file.path.full, {offset: this.offset, length: this.chunkSize});
 
                 let value = new Uint8Array(Object.values(data), 0, this.chunkSize);
                 if(value && (this.offset + value.byteLength > totalFileSize)) done = true;
@@ -123,7 +120,6 @@ export default function VideoPlayer(props) {
             });
 
             function load() {
-                let hadFirstSeg = false;
                 if (video.ms.readyState !== "open") return;
 
                 mp4boxFile = MP4Box.createFile();
@@ -222,7 +218,7 @@ export default function VideoPlayer(props) {
                 let ms = video.ms; // mediaSource
                 let track_id = mp4track.id;
                 let codec = mp4track.codec;
-                let mime = 'video/mp4; codecs=\"'+codec+'\"';
+                let mime = 'video/mp4; codecs="'+codec+'"';
 
                 if (MediaSource.isTypeSupported(mime)) {
                     sb = ms.addSourceBuffer(mime);

@@ -1,31 +1,29 @@
 import * as EventEmitter from "events";
 import * as stream from "stream";
 
-
-
 enum StreamState {
     "FLOWING",
     "PAUSED",
     "STOPED"
 }
 
-export declare interface StreamSenderChannel {
+export declare interface StreamSenderChannelBrowser {
     on(event: string, listener: Function): this;
     on(event: 'finish', listener: () => void): this;
-    on(event: 'close', listener: (channel: StreamSenderChannel) => void): this;
+    on(event: 'close', listener: (channel: StreamSenderChannelBrowser) => void): this;
 }
 
-export class StreamSenderChannel extends EventEmitter {
+export class StreamSenderChannelBrowser extends EventEmitter {
     channel: RTCDataChannel;
     id: number | null;
     label: string;
     state: StreamState;
-    stream: stream.Readable;
+    stream: ReadableStream;
     loop: Promise<any> | null = null;
     chunkSize = 16384;
     bufferLowThreshold = 16000000 * 0.80;
 
-    constructor(rtcDataChannel: RTCDataChannel, stream: stream.Readable) {
+    constructor(rtcDataChannel: RTCDataChannel, stream: ReadableStream) {
         super();
         this.channel = rtcDataChannel;
         this.id = rtcDataChannel.id;
@@ -33,12 +31,8 @@ export class StreamSenderChannel extends EventEmitter {
         this.channel.addEventListener("close",  this.handelClose.bind(this));
         this.state = StreamState.PAUSED;
         this.stream = stream;
-        this.stream.pause();
         this.channel.binaryType = "arraybuffer";
 
-        // if(this.channel.readyState === "open") {
-        //     this.start();
-        // }
     }
 
     handelClose(event: Event): any {
@@ -49,28 +43,44 @@ export class StreamSenderChannel extends EventEmitter {
     start(): Promise<void> {
         if(this.loop) return this.loop;
         this.state = StreamState.FLOWING;
-        this.loop = new Promise((resolve, reject) => {
 
-            this.stream.on("readable", async () => {
+        this.loop = new Promise(async (resolve, reject) => {
+            let reader = this.stream.getReader();
+
+            while (true) {
                 if(await this.ableToSend()) {
                     if(this.channel.readyState === "open") {
-                        let chunk = this.stream.read();
-                        if(chunk) this.channel.send(chunk);
+                        let { done, value } = await reader.read();
+                        if(done) break;
+
+                        let chunked: Uint8Array[] = [];
+                        let size = 128 * 1024;
+
+                        Array.from({length: Math.ceil(value.byteLength / size)}, (val, i) => {
+                            chunked.push(value.slice(i * size, i * size + size))
+                        });
+
+                        while (true) {
+                            let chunk = chunked.shift();
+                            if(await this.ableToSend()) {
+                                if(chunk) this.channel.send(chunk);
+                                else break;
+                            } else break;
+                        }
                     }
                 } else {
                     this.state = StreamState.STOPED;
-                    this.stream.destroy();
+                    //await this.stream.cancel();
                     this.channel.close();
                     reject();
+                    break;
                 }
-            });
+            }
 
-            this.stream.on("end", () => {
-                this.state = StreamState.STOPED;
-                this.stream.destroy();
-                this.channel.close();
-                resolve(undefined);
-            });
+            this.state = StreamState.STOPED;
+            // this.stream.cancel();
+            this.channel.close();
+            resolve(undefined);
         });
 
         this.loop.then(() => {
@@ -78,7 +88,6 @@ export class StreamSenderChannel extends EventEmitter {
         }).catch(() => {
             console.log("download aborted");
             if(this.channel.readyState === "open") this.channel.close();
-            this.stream.destroy();
         });
         return this.loop;
     }
@@ -100,7 +109,7 @@ export class StreamSenderChannel extends EventEmitter {
     ableToSend(): Promise<Boolean> {
         return new Promise<Boolean>(resolve => {
            let interval = setInterval(() => {
-               //console.log("looping", this.channel.bufferedAmount, this.bufferLowThreshold)
+               // console.log("looping", this.channel.bufferedAmount, this.bufferLowThreshold, this.state);
                if(this.state == StreamState.STOPED) {
                    clearInterval(interval);
                    return resolve(false);
@@ -109,7 +118,7 @@ export class StreamSenderChannel extends EventEmitter {
                    clearInterval(interval);
                    return resolve(true);
                }
-           },2);
+           }, 0);
         });
     }
 }

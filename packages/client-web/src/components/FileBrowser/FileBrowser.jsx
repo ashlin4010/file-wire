@@ -5,7 +5,6 @@ import { encode } from 'js-base64';
 import streamSaver from "streamsaver";
 import {MenuItem} from "@mui/material";
 
-
 export default function FileBrowser(props) {
     const {controller, fileStore, setFileStore, navHistory, domain} = props;
     const [contextMenu, setContextMenu] = React.useState(null);
@@ -43,9 +42,7 @@ export default function FileBrowser(props) {
         }
     }
 
-    const handleOpen = ({file, directory, event}) => {
-        open(file);
-    }
+    const handleOpen = ({file, directory, event}) => open(file);
 
     const handleContextMenu = ({file, directory, event, selected}) => {
         if(!event.ctrlKey) event.preventDefault();
@@ -103,9 +100,6 @@ export default function FileBrowser(props) {
     }
 
     const open = (file) => {
-
-        console.log(file.type);
-
         if(file.isDirectory) {
             handlePathChange(file.path.full,true, (success) => {
                 if(success) history.push(`/domain/${domain}/${encode(file.path.full)}`);
@@ -167,6 +161,7 @@ export default function FileBrowser(props) {
             channel.addEventListener("message", ({data}) => {
                 writer.write(new Uint8Array(data));
                 bytesReceived += data.byteLength;
+                // console.log(bytesReceived, file.size, bytesReceived === file.size);
             });
 
             channel.addEventListener("close", () => {

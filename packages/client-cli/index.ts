@@ -38,7 +38,10 @@ function tryConnect(maxRetries: number = 5): Promise<any>  {
             domainConnection.on("error", (err) => {
                 attempt += 1;
                 log("Websocket connection failed to be established, the target might not be online, retrying in 1 second");
-                if(attempt > maxRetries) reject("Websocket connection failed to be established");
+                if(attempt > maxRetries) {
+                    clearInterval(retry);
+                    reject("Websocket connection failed to be established");
+                }
             });
 
             domainConnection.on("connect", async (wsProxy) => {

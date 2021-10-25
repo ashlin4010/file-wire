@@ -1,9 +1,8 @@
 import {ReadOnlyFileSystemInterface, Stats} from "./FileSystemInterface";
-import * as stream from "node:stream";
 import * as Path from "path";
+import * as mime from "mime-types";
 // @ts-ignore
 import * as pathParse from "path-parse"
-import { toNodeReadable } from "web-streams-node";
 
 interface FileSystemStructure {
     [name: string] : FileSystemStructure | File;
@@ -34,10 +33,10 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
         });
     }
 
-    createReadStream(path: string, options?: {highWaterMark: number, start: number, end: number}): stream.Readable {
+    createReadStream(path: string, options?: {highWaterMark: number, start: number, end: number}): any {
         path = Path.normalize(path);
         let fileObject: unknown = this.resolvePath(path, this.fss);
-        if(this.isFile(fileObject)) return toNodeReadable((fileObject as File).stream());
+        if(this.isFile(fileObject)) return (fileObject as File).stream();
         throw new Error("ENOENT: no such file or directory " + path);
     }
 
@@ -71,7 +70,7 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
                     size: fileObject.size,
                     lastModified: fileObject.lastModified,
                     lastModifiedDate: fileObject.lastModifiedDate,
-                    type: fileObject.type,
+                    type: mime.lookup(name),
                     isDirectory: false,
                     path: parsePath,
                 }

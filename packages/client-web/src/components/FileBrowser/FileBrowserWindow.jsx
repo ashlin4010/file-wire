@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import {Box, Paper, Menu, MenuItem} from "@mui/material";
+import {Box, Paper, Menu} from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { encode } from 'js-base64';
 import FileGrid from "./FileGrid";

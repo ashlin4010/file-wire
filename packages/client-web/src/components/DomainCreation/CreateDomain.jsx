@@ -8,7 +8,6 @@ import useNavigationHistory from "./../../hooks/useNavigationHistory";
 import * as mime from "mime-types";
 import useFileSelection from "./../../hooks/useFileSelection";
 import CreateDomainWindow from "./CreateDomainWindow";
-import {dom} from "@fortawesome/fontawesome-svg-core";
 
 function convertToTree(flatFiles) {
     let rootDir = flatFiles["/"];
@@ -35,7 +34,6 @@ if (supported) {
     console.log('Using the fallback implementation.');
 }
 
-let domain = "testing2";
 let isServer = true;
 let isInitiator = !isServer;
 
@@ -44,19 +42,20 @@ function tryConnect(url,domain, maxRetries = 5) {
     return new Promise((resolve, reject) => {
         let attempt = 0;
         let retry = setInterval(() => {
-
             let domainConnection = new DomainConnection(url, domain, isServer ? "token" : undefined);
 
             domainConnection.on("error", (err) => {
                 attempt += 1;
                 console.log("Websocket connection failed to be established, the target might not be online, retrying in 1 second");
-                if(attempt > maxRetries) reject("Websocket connection failed to be established");
+                if(attempt > maxRetries) {
+                    clearInterval(retry);
+                    reject("Websocket connection failed to be established");
+                }
             });
 
             domainConnection.on("connect", async (wsProxy) => {
                 clearInterval(retry);
                 resolve({domainConnection, wsProxy});
-
 
                 domainConnection.on("disconnect", ((code, reason) => {
                     console.log("Connection to signalling server closed code:", code, "reason:", reason);
@@ -65,7 +64,6 @@ function tryConnect(url,domain, maxRetries = 5) {
                     tryConnect(url,domain).then(handleConnection).catch(connectFailed);
                 }));
             });
-
         }, 1000);
     });
 }
@@ -117,11 +115,10 @@ export default function CreateDomain(props) {
     const [domain, setDomain] = useState((Math.random() + 1).toString(36).substring(7).toUpperCase());
     const [path, setPath] = useState("/");
 
-
     useEffect(() => {
         deselectAll();
         pushSelected();
-    },[path]);
+    },[path]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const connect = (event, success, error) => {
         let tree = convertToTree(fileStore);

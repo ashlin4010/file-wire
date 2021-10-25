@@ -1,7 +1,6 @@
-import React, {useEffect} from "react";
+import React from "react";
 import FileBrowserAddressBar from "../FileBrowser/FileBrowserAddressBar";
 import FileGrid from "../FileBrowser/FileGrid";
-import useFileSelection from "../../hooks/useFileSelection";
 
 export default function BrowserWindow(props) {
 

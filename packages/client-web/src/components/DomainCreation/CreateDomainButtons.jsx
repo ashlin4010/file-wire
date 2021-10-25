@@ -55,7 +55,7 @@ export default function CreateDomainButtons(props) {
 
     useEffect(() => {
         history.push(`/create/${domain}`);
-    },[])
+    },[]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <React.Fragment>

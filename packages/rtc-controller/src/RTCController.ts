@@ -1,13 +1,16 @@
 import * as EventEmitter from "events";
 import type { RTCConnection } from "rtc-connection";
 import { ReqResChannel } from "./ReqResChannel";
-import { StreamSenderChannel } from "./StreamChannel"
+import { StreamSenderChannel } from "./StreamChannel";
+import { StreamSenderChannelBrowser } from "./StreamChannelBrowser";
 import * as Path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
 const CONTROL_CHANNEL_LABEL = "CONTROL";
 const GENERAL_CHANNEL_LABEL = "GENERAL_";
 const STREAM_CHANNEL_LABEL = "STREAM_";
+
+const IS_NODEJS = typeof window === "undefined";
 
 enum ControlCommand {
     "LIST_DIRECTORY",
@@ -162,8 +165,10 @@ export class RTCController extends EventEmitter {
         function fileStream(send: Function, command: ControlCommand, data?: { path: string, label: string }) {
             if (data?.path) {
                 console.log("downloading", data.path, data.label);
-                let rs = fs.createReadStream(data.path, {highWaterMark: 64 * 1024});
-                let stream = new StreamSenderChannel(rtc.createDataChannel(data.label), rs);
+                let rs = fs.createReadStream(data.path, {highWaterMark: 128 * 1024});
+                // let stream =
+                let stream = IS_NODEJS ? new StreamSenderChannel(rtc.createDataChannel(data.label), rs) :
+                    new StreamSenderChannelBrowser(rtc.createDataChannel(data.label), rs);
                 stream.start();
                 send({code: ControlStatusCodes.OK, data});
             }
