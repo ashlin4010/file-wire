@@ -149,7 +149,7 @@ export class RTCController extends EventEmitter {
             if (data?.path) {
                 let {path, options} = data;
                 fs.read(path, options)
-                    .then((data: ArrayBuffer) => {
+                    .then((data: Uint8Array) => {
                         send({code: ControlStatusCodes.OK, data});
                     })
                     .catch((e: any) => {

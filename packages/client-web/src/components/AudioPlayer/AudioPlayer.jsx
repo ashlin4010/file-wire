@@ -4,11 +4,11 @@ import useBrowserArguments from "../../hooks/useBrowserArguments";
 import {encode} from "js-base64";
 import ContentFrame from "../ContentFrame";
 
-export default function ImageViewer(props) {
+export default function AudioPlayer(props) {
     const {controller, fileStore} = props;
     const history = useHistory();
     const {path, createReConnectLink, domainAddress} = useBrowserArguments();
-    const [imageUrl, setImageURL] = useState(null);
+    const [audioUrl, setAudioURL] = useState(null);
     const [file, setFile] = useState(null);
 
     const returnToBrowser = () => {
@@ -26,7 +26,7 @@ export default function ImageViewer(props) {
     useEffect(() => {
         (async() => {
             if(file === null) return;
-            setImageURL(null);
+            setAudioURL(null);
             let chunkSize = 16000;
             let fileSize = file.size;
             let lastChunkOffset = (fileSize / chunkSize >> 0) * chunkSize;
@@ -37,26 +37,26 @@ export default function ImageViewer(props) {
                 let offset = i * chunkSize;
                 let length = chunkSize
                 let {data} = await controller?.readFile(file.path.full, {offset, length});
-
                 fileDataChunks.push(new Uint8Array(Object.values(data), 0, chunkSize));
             }
 
             let {data} = await controller?.readFile(file.path.full, {offset: lastChunkOffset, length:lastChunkOffsetLength});
             fileDataChunks.push(new Uint8Array(Object.values(data), 0, lastChunkOffsetLength));
 
-            let blob = new Blob(fileDataChunks);
+            let blob = new Blob(fileDataChunks, {type: file.type});
             const objectURL = URL.createObjectURL(blob);
-            setImageURL(objectURL);
+            setAudioURL(objectURL);
         })();
     },[file, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     return (
-    <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={imageUrl === null}>
-        <img alt={file && file.name}
-             style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}}
-             src={imageUrl !== null ? imageUrl : undefined}
-             onLoad={() => URL.revokeObjectURL(imageUrl)}/>
-    </ContentFrame>);
+        <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={audioUrl === null}>
+            <audio controls
+                 style={{width: "100%", marginLeft: "auto", marginRight: "auto", display: "block"}}
+                 src={audioUrl !== null ? audioUrl : undefined}
+                 onLoad={() => URL.revokeObjectURL(audioUrl)}/>
+        </ContentFrame>
+    );
 
 }

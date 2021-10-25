@@ -21,7 +21,7 @@ export declare interface EventWebSocket {
     onopen?: OpenListener;
     onerror?: ErrorListener;
 
-    close: () => void;
+    close: (code?: Number, reason?: String) => void;
     send: (data: MessageData) => void;
 }
 

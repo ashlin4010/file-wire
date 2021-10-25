@@ -130,6 +130,9 @@ export default function FileBrowser(props) {
                 case "application/pdf":
                     history.push(`/pdf/${domain}/${encode(file.path.full)}`);
                     break;
+                case "audio/mpeg":
+                    history.push(`/audio/${domain}/${encode(file.path.full)}`);
+                    break;
                 default: downLoad(file);
             }
         }
@@ -148,6 +151,7 @@ export default function FileBrowser(props) {
             case "video/mp4": return true;
             case "text/plain": return true;
             case "application/pdf": return true;
+            case "audio/mpeg": return true;
             default: return false
         }
     }

@@ -33,18 +33,16 @@ export default function TextViewer(props) {
             let fileSize = file.size;
             let lastChunkOffset = (fileSize / chunkSize >> 0) * chunkSize;
             let lastChunkOffsetLength = fileSize % chunkSize;
-            let {data} = await controller?.readFile(file.path.full, {offset: lastChunkOffset, length:lastChunkOffsetLength});
+            let {data} = await controller?.readFile(file.path.full, {offset: lastChunkOffset, length: lastChunkOffsetLength});
             let utf8decoder = new TextDecoder();
-            setText(utf8decoder.decode(new Uint8Array(data.data, 0, chunkSize)))
-
+            setText(utf8decoder.decode(new Uint8Array(Object.values(data), 0, lastChunkOffsetLength)));
         })();
     },[file, controller]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={!text}>
-            <Paper style={{width: "60vw", height: "60vh",textAlign: "start", padding: 10}}>
+            <Paper style={{width: "60vw", minHeight: "60vh",textAlign: "start", padding: 10}}>
                 <p>{!!text && text}</p>
             </Paper>
         </ContentFrame>);
-
 }

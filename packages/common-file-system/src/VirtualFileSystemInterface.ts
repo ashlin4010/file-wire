@@ -1,6 +1,8 @@
 import {ReadOnlyFileSystemInterface, Stats} from "./FileSystemInterface";
 import * as stream from "node:stream";
 import * as Path from "path";
+// @ts-ignore
+import * as pathParse from "path-parse"
 import { toNodeReadable } from "web-streams-node";
 
 interface FileSystemStructure {
@@ -17,7 +19,7 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
         this.fss = fileSystemStructure || null;
     }
 
-    read(path: string, options: {offset?: number, length?: number}): Promise<ArrayBuffer> {
+    read(path: string, options: {offset?: number, length?: number}): Promise<Uint8Array> {
         return new Promise((resolve, reject) => {
             let offset = options?.offset;
             let length = options?.length;
@@ -26,7 +28,7 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
             let fileObject: unknown = this.resolvePath(path, this.fss);
             if (!this.isFile(fileObject)) reject(new Error("ENOENT: no such file or directory " + path));
             else (fileObject as File).slice(offset, end).arrayBuffer()
-                .then(buffer => resolve(buffer))
+                .then(buffer => resolve(new Uint8Array(buffer, 0, buffer.byteLength)))
                 .catch(error =>reject(error))
             ;
         });
@@ -59,7 +61,7 @@ export class VirtualFileSystemInterface implements ReadOnlyFileSystemInterface {
             path = Path.normalize(path);
             let fileObject = this.resolvePath(path, this.fss);
             if(!this.isFile(fileObject) && !this.isDirectory(fileObject)) err = new Error("ENOENT: no such file or directory " + path);
-            let parsePath:any = Path.parse("/" + path);
+            let parsePath:any = pathParse("/" + path);
             parsePath.full = Path.join(parsePath.dir,parsePath.base);
             let name = parsePath.base;
             let stats: any;

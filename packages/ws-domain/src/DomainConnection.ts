@@ -74,4 +74,8 @@ export class DomainConnection extends EventEmitter {
         this.emit("error", err);
     }
 
+    public close(code?: Number, reason?: String): void {
+        this._ws.close(code, reason);
+    }
+
 }

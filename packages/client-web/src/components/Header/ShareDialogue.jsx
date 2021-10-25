@@ -54,7 +54,7 @@ export default function ShareDialogue(props) {
 
     const autoConnectURL = new URL(window.location.origin);
     if(domainAddress) autoConnectURL.searchParams.append("d", domainAddress);
-    if(route) autoConnectURL.searchParams.append("r", route);
+    if(route && route !== "create") autoConnectURL.searchParams.append("r", route);
     if(currentPath && base64Path) autoConnectURL.searchParams.append("p", base64Path);
     if(autoConnect && domainAddress) autoConnectURL.searchParams.append("a", autoConnect.toString());
     const shareLink = `${window.location.origin}/${autoConnectURL.search}`;

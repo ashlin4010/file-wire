@@ -22,8 +22,8 @@ export interface ReadOnlyFileSystemInterface {
     stat(path: string): Promise<Stats>;
     createReadStream(path: string, options?: {highWaterMark: number, start: number, end: number}): stream.Readable;
 
-    read(path: string, options: {offset?: number, length?: number}, callback?: (err: Error | null, buffer?: ArrayBuffer) => void): void;
-    read(path: string, options: any, callback?: (err: Error | null, buffer?: ArrayBuffer) => void): void;
+    read(path: string, options: {offset?: number, length?: number}, callback?: (err: Error | null, buffer?: Uint8Array) => void): void;
+    read(path: string, options: any, callback?: (err: Error | null, buffer?: Uint8Array) => void): void;
 
 
     read(path: string, options: {offset?: number, length?: number}): Promise<ArrayBuffer>;

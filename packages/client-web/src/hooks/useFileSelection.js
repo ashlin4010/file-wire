@@ -9,15 +9,36 @@ export default function useFileSelection(fileStore, setFileStore) {
     const select = (isSelected, paths) => {
         paths = Array.isArray(paths) ? paths : [paths];
         let updatedSelected = {};
-        paths.forEach((path) => selected[path] = {...fileStore[path], selected: isSelected});
+
+        paths.forEach((path) => {
+            selected[path] = {selected: isSelected}
+        });
         setSelected({...selected, ...updatedSelected});
     }
-    const pushSelected = () => setFileStore({...fileStore, ...selected});
-    const getSelected = () => Object.values(selected).filter((file) => file.selected);
+    const pushSelected = () => {
+        let currentSelected = {};
+        let oldFiles = Object.keys(selected);
+
+        oldFiles.forEach((fileName) => {
+            let file = fileStore[fileName];
+            let oldFile = selected[fileName];
+            if(!file) return;
+            currentSelected[fileName] = {...file, selected: oldFile.selected || false};
+        });
+        setFileStore({...fileStore, ...currentSelected});
+    }
+    const getSelected = () => {
+        let newSelected = [];
+        Object.entries(selected).forEach(([filename, file]) => {
+           if(!file.selected || !fileStore[filename]) return;
+            newSelected.push({...fileStore[filename], selected: true});
+        });
+        return newSelected;
+    }
     const handleSelection = ({file, directory, event}) => {
         event.stopPropagation();
         let {shiftKey, ctrlKey} = event;
-        let rootFolder = fileStore[directory];
+        let rootFolder = {...fileStore[directory]};
 
         if (!file) {
             select(false, rootFolder.children);
@@ -27,8 +48,8 @@ export default function useFileSelection(fileStore, setFileStore) {
 
         // if right click and have already have many files selected do nothing
         if(event.detail === 0) {
-            let selected = new Set(getSelected());
-            if(selected.has(file)) return;
+            let fileKeys = new Set(getSelected().map((file) => file.path.full));
+            if(fileKeys.has(file.path.full)) return;
         }
 
         if (!(shiftKey || ctrlKey)) select(false, rootFolder.children);
@@ -49,7 +70,21 @@ export default function useFileSelection(fileStore, setFileStore) {
         if (!(shiftKey)) setStartSelect(file);
         pushSelected();
     }
+    const deselectAll = () => {
+        // the only valid data in selected is selected.
+        // the only valid data in selected is selected.
+        // files may have changed or been deleted
+        let oldFiles = Object.keys(selected);
+        let deselected = {};
 
+        oldFiles.forEach((fileName) => {
+            let file = fileStore[fileName];
+            if(!file) return;
+            deselected[fileName] = {...file, selected: false};
+        })
+        setSelected(deselected);
 
-    return {select, pushSelected, handleSelection, getSelected: getSelected, setSelected};
+    };
+
+    return {select, pushSelected, handleSelection, getSelected: getSelected, setSelected, deselectAll};
 }

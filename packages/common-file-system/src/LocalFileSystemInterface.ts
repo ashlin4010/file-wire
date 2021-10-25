@@ -22,7 +22,7 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         let relativePath = this.safePath(path);
         let absolutePath = this.absolutePath(relativePath);
 
-        return new Promise<ArrayBuffer>((resolve, reject) => {
+        return new Promise<Uint8Array>((resolve, reject) => {
             let offset = options?.offset || 0;
             let length = options?.length;
 
@@ -39,7 +39,7 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
                             if (err) reject(err);
                             else fs.close(fd, (err => {
                                 if(err) reject(err);
-                                else resolve(buffer);
+                                else resolve(new Uint8Array(buffer, 0, buffer.byteLength));
                             }));
                         });
                     }

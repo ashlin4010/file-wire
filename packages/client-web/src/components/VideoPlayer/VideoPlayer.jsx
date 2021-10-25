@@ -19,9 +19,9 @@ class FileStream {
     constructor(controller, file) {
         this.controller = controller;
         this.file = file;
-        this.chunkSize = 500000 / 8;
+        this.chunkSize = 16000;
         this.offset = 0;
-        this.sleepTime = 500;
+        this.sleepTime = 0;
         this.isRunning = false;
         this.ondata = null;
     }
@@ -39,7 +39,7 @@ class FileStream {
     stop() {
         if(this.isRunning) {
             this.loop.then(() => {
-                this.offset = 0;
+                this.offset = 500;
             });
         }
         this.isRunning = false;
@@ -63,14 +63,13 @@ class FileStream {
         return new Promise(async (resolve, reject) => {
             let done = false;
             while (this.isRunning) {
-                console.log("reading data...");
+                // console.log("reading data...");
+
                 if(this.sleepTime) await this.sleep(this.sleepTime);
                 let totalFileSize = this.file.size;
-                //console.log("file size:", this.file.size, "offset:", this.offset, "length:", this.chunkSize);
-                let {data, code, message} = await this.controller.readFile(this.file.path.full, {offset: this.offset, length: this.chunkSize});
-                let value = new Uint8Array(data.data, 0, this.chunkSize);
+                let {data, code} = await this.controller.readFile(this.file.path.full, {offset: this.offset, length: this.chunkSize});
 
-
+                let value = new Uint8Array(Object.values(data), 0, this.chunkSize);
                 if(value && (this.offset + value.byteLength > totalFileSize)) done = true;
                 if(this.ondata) this.ondata({ done, value });
                 if(done) this.isRunning = false;
@@ -136,7 +135,7 @@ export default function VideoPlayer(props) {
 
                     let expectedNext = mp4boxFile.appendBuffer(buffer, true);
 
-                    console.log("read end:", fileStream.offset + buffer.byteLength, "Next read:", expectedNext, "file size:", file.size, done);
+                    // console.log("read end:", fileStream.offset + buffer.byteLength, "Next read:", expectedNext, "file size:", file.size, done);
 
                     if(expectedNext === undefined || expectedNext >= file.size) {
                         console.log("stop");
@@ -285,9 +284,4 @@ export default function VideoPlayer(props) {
         <ContentFrame name={file && file.name} onBack={returnToBrowser}>
             <VideoElement ref={videoElementRef}/>
         </ContentFrame>);
-
-    // return (
-    // <div style={{paddingTop: "10vh"}}>
-    //     <VideoElement ref={videoElementRef}/>
-    // </div>);
 }

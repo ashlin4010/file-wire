@@ -2,7 +2,7 @@ import React from "react";
 import {Grid} from "@mui/material";
 import "./FileGrid.css";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode} from "@fortawesome/free-solid-svg-icons";
+import {faFolder, faFile,faFileVideo, faFileImage, faFileAlt, faFilePdf, faFileArchive, faFileCode, faFileDownload} from "@fortawesome/free-solid-svg-icons";
 import {faFileAudio} from "@fortawesome/free-solid-svg-icons/faFileAudio";
 
 export default function FileGrid(props) {
@@ -19,27 +19,28 @@ export default function FileGrid(props) {
         event.stopPropagation();
         clearTimeout(timer);
         if (event.detail === 1 || event.detail === 0) {
-            onSelect({file, directory: path, event});
+            if(onSelect) onSelect({file, directory: path, event});
         } else if (event.detail === 2) {
-            onOpenClick({file, directory: path, event});
+            if(onOpenClick) onOpenClick({file, directory: path, event});
         }
     }
 
     const handleContextMenu = ({file, event})  => {
         event.stopPropagation();
         onSelect({file, directory: path, event});
-        onContextMenu({file, directory: path, event});
+        if(onContextMenu) onContextMenu({file, directory: path, event});
     }
 
     return (
         <Grid
+            style={props.style}
             container
             className={"file-grid"}
             direction={"row"}
             onClick={(event) => onSelect({file: null, directory: path, event})}
             onContextMenu={(event) => handleContextMenu({file: null, event})}
         >
-            {fileStore[path]?.children?.map((filePath) => <FileNode
+            {fileStore && fileStore[path]?.children?.map((filePath) => <FileNode
                 key={filePath}
                 file={fileStore[filePath]}
                 onSelect={handleClick}
@@ -80,6 +81,10 @@ function FileNode(props) {
                     fileIcon = faFileArchive
                     color = "#F1C40F"
                     break;
+                case "x-bittorrent":
+                    fileIcon = faFileDownload
+                    color = "#f18b0f"
+                    break;
                 default:
                     fileIcon = faFile
                     break;
@@ -107,13 +112,13 @@ function FileNode(props) {
     }
 
     function handleClick(event) {
-        onSelect({file, event});
+        if(onSelect) onSelect({file, event});
     }
 
     function handleContextMenu(event) {
         event.stopPropagation();
         onSelect({file, event});
-        onContextMenu({file, event});
+        if(onContextMenu) onContextMenu({file, event});
     }
 
     return (

@@ -49,7 +49,7 @@ export default function FileBrowserAddressBar(props) {
         // set display past should come from path
         if (e.key === 'Enter') {
             e.target.blur();
-            onPathChange(e.target.value);
+            if(onPathChange) onPathChange(e.target.value);
             changeDisplayPath(path);
         }
     }

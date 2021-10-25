@@ -5,7 +5,7 @@ packages/testing
 packages/*/node_modules
 packages/*/dest
 packages/*/build
-packages/client-cli/testdata
+packages/client-cli/share
 packages/demo/*/dest/
 .env
 packages/file-wire-server/public

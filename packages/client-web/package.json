@@ -18,6 +18,7 @@
     "@types/react-router-dom": "^5.3.1",
     "common-file-system": "^0.5.0",
     "js-base64": "^3.7.2",
+    "mime-types": "^2.1.33",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

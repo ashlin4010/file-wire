@@ -10,15 +10,16 @@ import useNavigationHistory from "../hooks/useNavigationHistory";
 
 import NavBar from "./Header/NavBar";
 import DomainConnectMenu from "./DomainConnectMenu/DomainConnectMenu";
+import CreateDomain from "./DomainCreation/CreateDomain";
 import FileBrowser from "./FileBrowser/FileBrowser";
 import ImageViewer from "./ImageViewer/ImageViewer";
 import VideoPlayer from "./VideoPlayer/VideoPlayer";
 import TextViewer from "./TextViewer/TextViewer";
 import PDFViewer from "./PDFViewer";
+import AudioPlayer from "./AudioPlayer/AudioPlayer";
 import "./App.css";
 
 const isProduction = process.env.NODE_ENV === "production";
-//const isProduction = true;
 
 function createDomainConnection(url, domain) {
     return new Promise((resolve, reject) => {
@@ -79,9 +80,9 @@ export default function App() {
     const [fileStore, setFileStore] = useState({});
     const [domain, setDomain] = useState(defaultDomain);
     const navHistory = useNavigationHistory();
+    let link = isProduction ? window.location.origin.replace("http", "ws") : "ws://localhost:8080";
 
     const handleConnectClick = (domain, openError, completeConnect) => {
-        let link = isProduction ? window.location.origin.replace("http", "ws") : "ws://localhost:8080";
         tryConnect(link, domain, true, false)
             .then(controller => {
                 controller.on("disconnect", () => {
@@ -93,6 +94,10 @@ export default function App() {
             .catch(() => {
                 setTimeout(openError, 600);
             });
+    }
+
+    const handleCreateDomain = () => {
+        history.push(`/create`);
     }
 
     return (
@@ -107,6 +112,10 @@ export default function App() {
                         setFileStore={setFileStore}
                         navHistory={navHistory}
                     />
+                </Route>
+
+                <Route path="/create">
+                    <CreateDomain url={link}/>
                 </Route>
 
                 <Route path="/image/:domainAddress/:base64Path?">
@@ -137,6 +146,13 @@ export default function App() {
                     />
                 </Route>
 
+                <Route path="/audio/:domainAddress/:base64Path?">
+                    <AudioPlayer
+                        controller={controller}
+                        fileStore={fileStore}
+                    />
+                </Route>
+
 
                 <Route path="/*">
                     <DomainConnectMenu
@@ -144,6 +160,7 @@ export default function App() {
                         domain={domain}
                         setDomain={setDomain}
                         onConnect={handleConnectClick}
+                        onCreateDomain={handleCreateDomain}
                     />
                 </Route>
             </Switch>

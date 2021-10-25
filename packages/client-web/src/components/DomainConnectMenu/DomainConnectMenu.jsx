@@ -38,7 +38,7 @@ function useQuery() {
 }
 
 export default function DomainConnectMenu(props) {
-    let {onConnect, RTCController, domain, setDomain} = props;
+    let {onConnect, RTCController, domain, setDomain, onCreateDomain} = props;
 
     let {a: autoConnect, p:path, d: queryDomain, r: route} = useQuery();
     domain = queryDomain ? queryDomain : domain;
@@ -50,7 +50,6 @@ export default function DomainConnectMenu(props) {
     const history = useHistory();
     const isConnected = RTCController !== null;
     const [currentDomainInput, setCurrentDomainInput] = useState(domain);
-
 
     // http://localhost:3000/?a=true&p=Lw%3D%3D&domain=testing
 
@@ -128,7 +127,7 @@ export default function DomainConnectMenu(props) {
                         {isConnected ? "Resume" : "Connect"}
                     </CssLoadingButton>
                     {isConnected && <Button onClick={disconnect} color="error" style={{marginTop: 8}} variant="outlined">Disconnect</Button>}
-                    <Button disabled style={{marginTop: 32}} variant="contained">Create New Domain</Button>
+                    <Button onClick={onCreateDomain} style={{marginTop: 32}} variant="contained">Create New Domain</Button>
                 </Grid>
             </Paper>
             <ErrorDialogConnection

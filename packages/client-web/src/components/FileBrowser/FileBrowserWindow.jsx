@@ -63,7 +63,6 @@ export default function FileBrowser(props) {
         });
     },[]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
     return (<div onContextMenu={handleClose}>
             <Menu
                 disableAutoFocusItem
