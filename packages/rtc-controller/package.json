@@ -1,6 +1,6 @@
 {
   "name": "rtc-controller",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Transfer data between WebRTC clients",
   "author": "ashlin4010",
   "license": "MIT",

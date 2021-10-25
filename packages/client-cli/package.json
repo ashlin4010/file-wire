@@ -1,6 +1,6 @@
 {
   "name": "client-cli",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Cli fileWire client",
   "author": "ashlin4010",
   "license": "MIT",
@@ -19,9 +19,9 @@
     "typescript": "^4.4.3"
   },
   "dependencies": {
-    "common-file-system": "^0.6.0",
+    "common-file-system": "^0.6.1",
     "rtc-connection": "^0.6.0",
-    "rtc-controller": "^0.6.0",
+    "rtc-controller": "^0.6.1",
     "ws-domain": "^0.6.0"
   }
 }
