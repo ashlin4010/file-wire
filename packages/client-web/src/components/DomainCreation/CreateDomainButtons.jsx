@@ -4,15 +4,18 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import CasinoIcon from "@mui/icons-material/Casino";
 import {withStyles} from "@mui/styles";
 import {useHistory} from "react-router-dom";
+import ShareDialogue from "../Header/ShareDialogue";
 
 
 const CssTextField = withStyles({
     root: {
+        margin: 0,
+        paddingTop: 16,
         '& label.Mui-focused': {
             color: 'white',
         },
         "& .MuiInputLabel-root": {
-            color: "white"
+            color: "white",
         },
         "& .MuiOutlinedInput-input": {
             color: "white"
@@ -32,6 +35,7 @@ export default function CreateDomainButtons(props) {
     const {setDomain, domain, onConnect, onDisconnect, onNewFolder, onRemoveSelected, onAddFile} = props;
     const [loading, setLoading] = useState(false);
     const [connected, setConnected] = useState(false);
+    const [shareOpen, setShareOpen] = useState(false);
     const history = useHistory();
 
     const handleConnect = (event) => {
@@ -59,7 +63,7 @@ export default function CreateDomainButtons(props) {
 
     return (
         <React.Fragment>
-            <Grid sx={{ width: '20ch' }} container direction={"column"} justifyContent={"space-between"} spacing="16">
+            <Grid sx={{ width: '20ch' }} container direction={"column"} justifyContent={"space-between"} spacing="8">
                 <Grid item>
                     <Button
                         fullWidth
@@ -108,16 +112,33 @@ export default function CreateDomainButtons(props) {
                                 </InputAdornment>,
                         }}
                     />
+                </Grid>
+
+                <Grid item>
                     <LoadingButton
                         fullWidth
                         disableElevation
-                        color={connected ? "error": "secondary"}
+                        color={connected ? "error": "success"}
                         variant="contained"
                         onClick={connected ? handleDisconnect : handleConnect}
                         loading={loading}
-                    >{connected ? "Close Share": "Open Share"}</LoadingButton>
+                    >
+                        {connected ? "Close Share": "Open Share"}
+                    </LoadingButton>
+                </Grid>
+
+
+                <Grid item>
+                    <Button
+                        fullWidth
+                        disableElevation
+                        color="secondary"
+                        variant="contained"
+                        onClick={() => setShareOpen(true)}
+                    >Get Link</Button>
                 </Grid>
             </Grid>
+            <ShareDialogue open={shareOpen} setOpen={setShareOpen}/>
         </React.Fragment>
     );
 

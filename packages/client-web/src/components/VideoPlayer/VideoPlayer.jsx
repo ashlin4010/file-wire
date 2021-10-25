@@ -6,7 +6,7 @@ import {encode} from "js-base64";
 let MP4Box = require('./mp4box.all.min');
 
 const VideoElement = React.forwardRef((props, ref) => {
-    return <video style={{maxWidth: "60vw", maxHeight: "70vh", marginLeft: "auto", marginRight: "auto", display: "block"}} controls ref={ref}/>
+    return <video style={{maxWidth: "60vw", marginLeft: "auto", marginRight: "auto", display: "block"}} controls ref={ref}/>
 });
 
 const SAMPLE_SIZE = 100;
@@ -231,7 +231,6 @@ export default function VideoPlayer(props) {
 
             function initializeSourceBuffers() {
                 var initSegs = mp4boxFile.initializeSegmentation();
-
                 for (let i = 0; i < initSegs.length; i++) {
                     let sb = initSegs[i].user;
                     if (i === 0) sb.ms.pendingInits = 0; // define pendingInits prop
