@@ -1,43 +1,10 @@
 import * as React from 'react';
-import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Snackbar} from '@mui/material';
+import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Grid, Divider} from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import CloseIcon from '@mui/icons-material/Close';
 import QRCode from "qrcode.react";
 import NoShadowDialog from "../NoShadowDialog";
+import useCopyToClipboard from "../../hooks/useCopyToClipboard";
 import {useState} from "react";
-
-
-function CopyOutcomeSnackbar(props) {
-    let {successful, open, setOpen, autoHideDuration} = props;
-    autoHideDuration = autoHideDuration || 800;
-
-    const handleClose = (event, reason) => {
-        if (reason === 'clickaway') {return;}
-        setOpen(false);
-    };
-
-    const action = (
-        <React.Fragment>
-            <IconButton
-                size="small"
-                color="inherit"
-                onClick={handleClose}
-            >
-                <CloseIcon fontSize="small" />
-            </IconButton>
-        </React.Fragment>
-    );
-
-    return (
-        <Snackbar
-            open={open}
-            autoHideDuration={autoHideDuration}
-            onClose={handleClose}
-            message={successful ? "Copied to clipboard!" : "Failed to copied!"}
-            action={action}
-        />
-    );
-}
 
 
 export default function ShareDialogue(props) {
@@ -45,8 +12,7 @@ export default function ShareDialogue(props) {
 
     const [autoConnect, setAutoConnect] = useState(true);
     const [currentPath, setCurrentPath] = useState(true);
-    const [copySnackbarOpen, setCopySnackbarOpen] = useState(false);
-    const [copySuccessful, setCopySuccessful] = useState(true);
+    const {setClipboard, CopyOutcomeSnackbar, setCopySnackbarOpen} = useCopyToClipboard();
 
     const route = window.location.pathname.split("/")[1];
     const domainAddress = window.location.pathname.split("/")[2];
@@ -59,13 +25,6 @@ export default function ShareDialogue(props) {
     if(autoConnect && domainAddress) autoConnectURL.searchParams.append("a", autoConnect.toString());
     const shareLink = `${window.location.origin}/${autoConnectURL.search}`;
 
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(shareLink)
-            .then(() => {
-                setCopySuccessful(true);
-                setCopySnackbarOpen(true);
-            });
-    };
 
     const closeDialogue = () => {
         setOpen(false);
@@ -76,31 +35,58 @@ export default function ShareDialogue(props) {
         <NoShadowDialog onClose={closeDialogue} open={open}>
             <DialogTitle style={{textAlign: "center"}}>Share</DialogTitle>
             <DialogContent>
-                <QRCode size={256} level={"M"} value={shareLink} />
+                <Grid container spacing={2} justifyContent={"center"}>
+                    <Grid item>
+                        <FormGroup>
+                        <TextField
+                            margin="dense"
+                            variant="outlined"
+                            label="Domain Address"
+                            value={domainAddress}
+                            InputProps={{
+                                endAdornment:
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            edge="end"
+                                            onClick={() => setClipboard(domainAddress)}
+                                        >
+                                            <ContentCopyIcon/>
+                                        </IconButton>
+                                    </InputAdornment>
+                            }}
+                        />
 
-                <FormGroup>
-                    <FormControlLabel control={<Switch onChange={(e) => setAutoConnect(e.target.checked)} checked={autoConnect} />} label="Auto Connect" />
-                    <FormControlLabel disabled={route !== "domain"} control={<Switch onChange={(e) => setCurrentPath(e.target.checked)} checked={currentPath} />} label="Use Current Path" />
-                    <TextField
-                        fullWidth
-                        multiline
-                        value={shareLink}
-                        margin="normal"
-                        variant="outlined"
-                        InputProps={{
-                            endAdornment:
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={copyToClipboard}
-                                        edge="end">
-                                        <ContentCopyIcon />
-                                    </IconButton>
-                                </InputAdornment>,
-                        }}
-                    />
-                </FormGroup>
-                <CopyOutcomeSnackbar setOpen={setCopySnackbarOpen} open={copySnackbarOpen} successful={copySuccessful}/>
+                        <FormControlLabel control={<Switch onChange={(e) => setAutoConnect(e.target.checked)} checked={autoConnect} />} label="Auto Connect" />
+                        {route === "domain" && <FormControlLabel disabled={route !== "domain"} control={<Switch onChange={(e) => setCurrentPath(e.target.checked)} checked={currentPath} />} label="Use Current Path" />}
+
+
+                        <TextField
+                            fullWidth
+                            multiline
+                            value={shareLink}
+                            margin="normal"
+                            variant="outlined"
+                            label="URL"
+                            InputProps={{
+                                endAdornment:
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setClipboard(shareLink)}
+                                            edge="end">
+                                            <ContentCopyIcon />
+                                        </IconButton>
+                                    </InputAdornment>,
+                            }}
+                        />
+                    </FormGroup>
+                    </Grid>
+
+                    <Grid item>
+                        <QRCode size={256} level={"M"} value={shareLink} />
+                    </Grid>
+                </Grid>
             </DialogContent>
+            <CopyOutcomeSnackbar/>
         </NoShadowDialog>
     );
 }

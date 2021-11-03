@@ -54,8 +54,10 @@ export default function DomainConnectMenu(props) {
     // http://localhost:3000/?a=true&p=Lw%3D%3D&domain=testing
 
     const handleChange = (event) => {
-        setDomain(event.target.value);
-        setCurrentDomainInput(event.target.value);
+        let domainAddress = event.target.value.toUpperCase();
+        console.log(domainAddress);
+        setDomain(domainAddress);
+        setCurrentDomainInput(domainAddress);
     }
 
     const completeConnect = () => {
@@ -114,7 +116,7 @@ export default function DomainConnectMenu(props) {
                         size={"small"}
                         color="primary"
                         label="Domain"
-                        defaultValue={currentDomainInput}
+                        value={currentDomainInput}
                         variant="outlined"
                         placeholder={"#Domain"}
                         disabled={isConnected}
@@ -126,7 +128,7 @@ export default function DomainConnectMenu(props) {
                         variant="contained">
                         {isConnected ? "Resume" : "Connect"}
                     </CssLoadingButton>
-                    {isConnected && <Button onClick={disconnect} color="error" style={{marginTop: 8}} variant="outlined">Disconnect</Button>}
+                    {isConnected && <Button onClick={disconnect} color="error" style={{marginTop: 8}} variant="contained">Disconnect</Button>}
                     <Button onClick={onCreateDomain} style={{marginTop: 32}} variant="contained">Create New Domain</Button>
                 </Grid>
             </Paper>

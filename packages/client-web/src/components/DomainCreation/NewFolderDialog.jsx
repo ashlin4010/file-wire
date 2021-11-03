@@ -45,7 +45,8 @@ export default function ErrorDialogConnection(props) {
                     autoFocus
                     error={inError}
                     helperText={errorMessage}
-                    value={value} onChange={(e) => setValue(e.target.value)}
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
                     onKeyUp={handleInputEnter}
                     placeholder="Name"
                     variant="standard" />

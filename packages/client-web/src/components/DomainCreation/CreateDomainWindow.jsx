@@ -36,6 +36,7 @@ export default function CreateDomainWindow(props) {
                 open={newFolderDialogOpen}
                 onClose={() => setNewFolderDialogOpen(false)}
                 onCreate={(name, error) => {
+                    if(name === "") return error("Invalid Name");
                     let success = addFolder(name);
                     if(success) setNewFolderDialogOpen(false);
                     else error("Folder Already Exists");
@@ -82,6 +83,4 @@ export default function CreateDomainWindow(props) {
             </Grid>
         </Box>
     );
-
-
 }

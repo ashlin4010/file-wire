@@ -5,6 +5,8 @@ import * as mime from "mime-types";
 import * as stream from "node:stream";
 import {ReadWriteFileSystemInterface, Stats} from "./FileSystemInterface";
 import {Buffer} from "buffer";
+// @ts-ignore
+import * as pathParse from "path-parse"
 let Path = path;
 
 
@@ -90,7 +92,7 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         return new Promise((resolve, reject) => {
             let relativePath = this.safePath(path);
             let absolutePath = this.absolutePath(relativePath);
-            let parsePath:any = Path.parse(relativePath);
+            let parsePath:any = pathParse(relativePath);
             parsePath.full = Path.join(parsePath.dir, parsePath.base);
             let name = parsePath.base;
             fs.stat(absolutePath, (err, stats) => {
