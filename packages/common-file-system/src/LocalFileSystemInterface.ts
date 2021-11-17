@@ -34,7 +34,6 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
                     if (err) reject(err);
                     else {
                         length = length || stats.size;
-                        // prevent over reading file
                         if(offset + length > stats.size) length = stats.size - offset;
                         let b = Buffer.alloc(length);
                         fs.read(fd, b, 0, length, offset, (err, bytesRead, buffer) => {
@@ -92,7 +91,7 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         return new Promise((resolve, reject) => {
             let relativePath = this.safePath(path);
             let absolutePath = this.absolutePath(relativePath);
-            let parsePath:any = pathParse(relativePath);
+            let parsePath:any = pathParse("/" + path);
             parsePath.full = Path.join(parsePath.dir, parsePath.base);
             let name = parsePath.base;
             fs.stat(absolutePath, (err, stats) => {

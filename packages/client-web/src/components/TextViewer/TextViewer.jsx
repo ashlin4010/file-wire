@@ -42,7 +42,7 @@ export default function TextViewer(props) {
     return (
         <ContentFrame name={file && file.name} onBack={returnToBrowser} loading={!text}>
             <Paper style={{width: "60vw", minHeight: "60vh",textAlign: "start", padding: 10}}>
-                <p>{!!text && text}</p>
+                <pre style={{whiteSpace: "pre-wrap" }}>{!!text && text}</pre>
             </Paper>
         </ContentFrame>);
 }

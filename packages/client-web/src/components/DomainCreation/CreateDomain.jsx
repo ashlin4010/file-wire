@@ -12,10 +12,9 @@ import CreateDomainWindow from "./CreateDomainWindow";
 function convertToTree(flatFiles) {
     let rootDir = flatFiles["/"];
     function getChildren(node) {
-        if(!node) return {};
+        if(!node || !node.children) return {};
         let children = node.children;
         let nodes = {};
-
         children.forEach((key) => {
             let node = flatFiles[key];
             if(node.isDirectory) nodes[node.name] = getChildren(node);

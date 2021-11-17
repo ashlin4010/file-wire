@@ -42,6 +42,7 @@ export default function useCopyToClipboard() {
     }
 
     const copyToClipboard = (text) => {
+        if(!text) return;
         navigator.clipboard.writeText(text)
             .then(() => {
                 setCopySuccessful(true);
