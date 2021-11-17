@@ -1,6 +1,6 @@
 {
   "name": "ws-domain",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Websocket proxy",
   "main": "dest/index.js",
   "types": "dest/index.d.ts",

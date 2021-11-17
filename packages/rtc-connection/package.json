@@ -1,6 +1,6 @@
 {
   "name": "rtc-connection",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Library for managing WebRTC connections",
   "author": "ashlin4010",
   "license": "MIT",
