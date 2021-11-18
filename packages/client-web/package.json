@@ -1,6 +1,6 @@
 {
   "name": "client-web",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "FileWire Web Client",
   "author": "ashlin4010",
   "license": "MIT",
@@ -16,7 +16,7 @@
     "@mui/material": "^5.0.2",
     "@mui/styles": "^5.0.1",
     "@types/react-router-dom": "^5.3.1",
-    "common-file-system": "^0.7.0",
+    "common-file-system": "^0.7.1",
     "js-base64": "^3.7.2",
     "mime-types": "^2.1.33",
     "qrcode.react": "^1.0.1",

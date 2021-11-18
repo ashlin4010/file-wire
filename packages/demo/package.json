@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Random demos and testing",
   "main": "index.js",
   "author": "ashlin4010",
@@ -9,7 +9,7 @@
     "build": "node rtcConnection/build.js && node fileSystem/build.js"
   },
   "dependencies": {
-    "common-file-system": "^0.7.0",
+    "common-file-system": "^0.7.1",
     "express": "^4.17.1",
     "rtc-connection": "^0.7.0",
     "rtc-controller": "^0.7.0",
