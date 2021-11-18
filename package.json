@@ -10,7 +10,8 @@
     "watch": "npx lerna run --parallel watch --scope '{file-wire-server,client-cli,client-web}'",
     "build-web-client": "npx lerna run build --scope client-web",
     "build-server": "npx lerna run build --scope file-wire-server",
-    "start-server": "npx lerna run --parallel start --scope file-wire-server"
+    "start-server": "npx lerna run --parallel start --scope file-wire-server",
+    "pack": "npx lerna run build --scope client-cli"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",

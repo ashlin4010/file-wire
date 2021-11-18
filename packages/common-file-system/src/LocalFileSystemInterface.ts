@@ -6,7 +6,8 @@ import * as stream from "node:stream";
 import {ReadWriteFileSystemInterface, Stats} from "./FileSystemInterface";
 import {Buffer} from "buffer";
 // @ts-ignore
-import * as pathParse from "path-parse"
+import * as pathParse from "path-parse";
+import slash from './slash';
 let Path = path;
 
 
@@ -91,8 +92,10 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         return new Promise((resolve, reject) => {
             let relativePath = this.safePath(path);
             let absolutePath = this.absolutePath(relativePath);
-            let parsePath:any = pathParse("/" + path);
-            parsePath.full = Path.join(parsePath.dir, parsePath.base);
+            let parsePath:any = pathParse.posix("/" + this.cleanPath(path));
+            if(parsePath.dir === "") parsePath.dir = "/";
+            parsePath.full = slash(Path.join(parsePath.dir, parsePath.base));
+
             let name = parsePath.base;
             fs.stat(absolutePath, (err, stats) => {
                 if(err) reject(err);
@@ -112,12 +115,20 @@ export class LocalFileSystemInterface implements ReadWriteFileSystemInterface {
         });
     }
 
-    safePath(unsafePath: string) {
-        return path.normalize(unsafePath).replace(/^(\.\.(\/|\\|$))+/, '');
+    cleanPath(path: string) {
+        path = slash(path);
+        if(path[path.length - 1] === "/") path = path.slice(0, path.length - 1);
+        if(path.length > 1 && path[0] === "/") path = path.slice(1);
+        return path;
     }
 
+    safePath(unsafePath: string) {
+        return slash(path.normalize(unsafePath).replace(/^(\.\.(\/|\\|$))+/, ''));
+    }
+
+
     absolutePath(relativePath: string) {
-        return path.join(this.rootPath, relativePath);
+        return slash(path.join(this.rootPath, relativePath));
     }
 
 }

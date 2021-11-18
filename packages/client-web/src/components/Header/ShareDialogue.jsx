@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Grid, Divider} from '@mui/material';
+import {DialogTitle, DialogContent, FormGroup, FormControlLabel, Switch, TextField, InputAdornment, IconButton, Grid} from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import QRCode from "qrcode.react";
 import NoShadowDialog from "../NoShadowDialog";

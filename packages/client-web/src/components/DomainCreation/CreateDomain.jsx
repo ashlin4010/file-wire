@@ -115,6 +115,10 @@ export default function CreateDomain(props) {
     const [path, setPath] = useState("/");
 
     useEffect(() => {
+        navHistory.add(path);
+    },[])
+
+    useEffect(() => {
         deselectAll();
         pushSelected();
     },[path]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -186,17 +190,21 @@ export default function CreateDomain(props) {
     const addFile = () => {
         let parentPath = path;
         let parentFolder = {...fileStore[parentPath]};
+        let currentFiles = new Set(parentFolder.children)
+
         fileOpen({
             startIn: 'downloads',
             multiple: true,
         }).then(files => {
             let newFiles = files.map(file => createFileObject(parentPath, file));
             let newFilesObject = {};
-            newFiles.forEach((file) => newFilesObject[file.path.full] = file);
+            newFiles.forEach((file) => {
+                if(!currentFiles.has(file.path.full)) newFilesObject[file.path.full] = file
+            });
             parentFolder.children = parentFolder.children ? [...parentFolder.children, ...Object.keys(newFilesObject)] : [...Object.keys(newFilesObject)];
             let newFileStore = {...fileStore, ...newFilesObject, [parentPath]: parentFolder};
             setFileStore(newFileStore);
-        });
+        }).catch(() => {});
     }
 
     const removeSelected = () => {
