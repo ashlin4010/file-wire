@@ -115,10 +115,10 @@ export default function DomainConnectMenu(props) {
                         margin="normal"
                         size={"small"}
                         color="primary"
-                        label="Domain"
+                        label="Domain Address"
                         value={currentDomainInput}
                         variant="outlined"
-                        placeholder={"#Domain"}
+                        placeholder={"Domain Address"}
                         disabled={isConnected}
                     />
                     <CssLoadingButton

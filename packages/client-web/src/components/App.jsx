@@ -75,7 +75,7 @@ function tryConnect(url, domainAddress, isInitiator, isServer) {
 
 
 export default function App() {
-    const defaultDomain = isProduction ? "" : "testing";
+    const defaultDomain = isProduction ? "" : "TESTING";
     const [controller, setController] = useState(null);
     const [fileStore, setFileStore] = useState({});
     const [domain, setDomain] = useState(defaultDomain);

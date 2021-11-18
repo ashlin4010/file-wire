@@ -4,7 +4,7 @@ import * as path from "path";
 const config_path = path.join(process.cwd(), "config.json");
 
 let config: any = {
-    domain: (Math.random() + 1).toString(36).substring(7),
+    domain: (Math.random() + 1).toString(36).substring(7).toUpperCase(),
     path: "./share"
 };
 

@@ -178,6 +178,7 @@ export default function FileBrowser(props) {
             controller={controller}
             fileStore={fileStore}
             setFileStore={setFileStore}
+            navHistory={navHistory}
             onOpen={handleOpen}
             onPathChange={handlePathChange}
             onLocationNext={handleLocationChange}

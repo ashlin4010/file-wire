@@ -8,19 +8,17 @@ const isProduction = process.env.NODE_ENV !== "development";
 const serverAdr = process.env.SERVER_ADR || "filewire.io";
 let url = isProduction ? `wss://${serverAdr}` : "ws://127.0.0.1:8080";
 
-console.log(config);
-
 // @ts-ignore
 let path = config["path"];
 // @ts-ignore
-let domain = config["domain"];
+let domain = config["domain"].toUpperCase();
 let isServer = true;
 let isInitiator = !isServer;
 let domainConnection: DomainConnection;
 
 // start client
 log("Domain:", domain);
-log("URL:", url);
+log("Path:", path);
 log("Connecting to signalling server...");
 
 
@@ -63,6 +61,10 @@ function connectFailed() {
 
 async function connect({domainConnection, wsProxy}: any) {
     log("Connected to signalling server");
+
+    log("To connect to your share go to:");
+    log(`https://${serverAdr}/?d=${domain}`);
+
     if(isServer) {
         wsProxy.on("connection", (ws: any) => {
             log("Client has joint domain")
@@ -86,9 +88,6 @@ async function connect({domainConnection, wsProxy}: any) {
             controller.on("control", (channel) => {
                 log("Control channel open and ready");
                 ws.close();
-                // channel.on("message", (message, send) => {
-                //     log(message);
-                // });
             });
         });
     }

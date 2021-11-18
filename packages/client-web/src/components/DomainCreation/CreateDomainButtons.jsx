@@ -11,7 +11,6 @@ import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-
 const CssTextField = withStyles({
     root: {
         margin: 0,
@@ -41,7 +40,7 @@ export default function CreateDomainButtons(props) {
     const [loading, setLoading] = useState(false);
     const [connected, setConnected] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
-    const {setClipboard, CopyOutcomeSnackbar, setCopySnackbarOpen} = useCopyToClipboard();
+    const {setClipboard, CopyOutcomeSnackbar} = useCopyToClipboard();
     const history = useHistory();
 
     const handleConnect = (event) => {

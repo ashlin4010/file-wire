@@ -13,6 +13,7 @@ export default function FileBrowser(props) {
         controller,
         fileStore,
         setFileStore,
+        navHistory,
         onOpen,
         onPathChange,
         onLocationNext,
@@ -54,7 +55,11 @@ export default function FileBrowser(props) {
 
     useEffect(() => {
         if (controller === null) return history.push(createReConnectLink());
-        onPathChange(path, true, (accepted) => {
+        // only add to history if the has is been loaded for the first time
+        // previous history means that the page is not new
+        let useHistory = navHistory.previous() === false;
+
+        onPathChange(path, useHistory, (accepted) => {
             if(accepted) {
                 history.push(`/domain/${domainAddress}/${encode(path)}`);
             } else {

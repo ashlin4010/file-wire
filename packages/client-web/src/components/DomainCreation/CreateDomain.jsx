@@ -116,7 +116,7 @@ export default function CreateDomain(props) {
 
     useEffect(() => {
         navHistory.add(path);
-    },[])
+    },[]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         deselectAll();
